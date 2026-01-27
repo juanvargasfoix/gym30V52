@@ -214,7 +214,7 @@ export const Landing: React.FC<LandingProps> = ({ onLogin }) => {
       {/* Footer message bottom fixed */}
       <div className="absolute bottom-6 w-full text-center opacity-60 pointer-events-none">
         <p className="text-slate-600 font-medium text-xs tracking-wide">
-          Basado en Management 3.0 • Gamificación • IA • Colaboración
+          Powered by Vargas Foix - Agencia
         </p>
       </div>
     </div>
