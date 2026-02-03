@@ -23,12 +23,6 @@ const App: React.FC = () => {
 
         if (supabaseUser) {
           setCurrentUser(supabaseUser as unknown as User);
-        } else {
-          // Fallback: Check for Session in localStorage
-          const savedUser = localStorage.getItem('currentUser');
-          if (savedUser) {
-            setCurrentUser(JSON.parse(savedUser));
-          }
         }
       } catch (error) {
         console.error('❌ Error inicializando app:', error);
@@ -43,7 +37,6 @@ const App: React.FC = () => {
   const handleLogin = (user: User) => {
     try {
       setCurrentUser(user);
-      localStorage.setItem('currentUser', JSON.stringify(user));
     } catch (error) {
       console.error('❌ Error en login:', error);
     }
@@ -53,7 +46,6 @@ const App: React.FC = () => {
     try {
       await logoutUser();
       setCurrentUser(null);
-      localStorage.removeItem('currentUser');
     } catch (error) {
       console.error('❌ Error en logout:', error);
     }
@@ -66,7 +58,6 @@ const App: React.FC = () => {
       const updated = allUsers.find((u: User) => u.username === currentUser?.username);
       if (updated) {
         setCurrentUser(updated);
-        localStorage.setItem('currentUser', JSON.stringify(updated));
       }
     } catch (error) {
       console.error('❌ Error completando onboarding:', error);

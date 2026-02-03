@@ -25,7 +25,7 @@ export const Landing: React.FC<LandingProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      // 1. Intentar login con Supabase (email + password)
+      // Intentar login con Supabase (email + password)
       const result = await loginUser(username, password);
 
       if (result.success) {
@@ -33,17 +33,9 @@ export const Landing: React.FC<LandingProps> = ({ onLogin }) => {
         return;
       }
 
-      // 2. Fallback: buscar en localStorage mock data
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const user = users.find((u: User) => (u.username === username || u.email === username) && u.password === password);
-
-      if (user) {
-        onLogin(user);
-      } else {
-        // Si falló Supabase y no existe en local mock, mostrar error de Supabase
-        setError(handleAuthError(result.error));
-        setLoading(false);
-      }
+      // Si falló Supabase, mostrar error de Supabase
+      setError(handleAuthError(result.error));
+      setLoading(false);
     } catch (err) {
       console.error(err);
       setError('Error al procesar login.');
