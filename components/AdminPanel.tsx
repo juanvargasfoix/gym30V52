@@ -1113,7 +1113,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                                                         {user.role}
                                                     </span>
                                                 </td>
-                                                <td className="p-4 text-slate-600">{user.company || '-'}</td>
+                                                <td className="p-4 text-slate-600">
+                                                    {user.company ? (companies.find(c => c.id === user.company)?.name || '-') : '-'}
+                                                </td>
                                                 <td className="p-4 text-slate-600">{user.supervisor || '-'}</td>
                                                 <td className="p-4 flex gap-2">
                                                     <button
