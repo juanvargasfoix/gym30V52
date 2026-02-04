@@ -51,13 +51,12 @@ const App: React.FC = () => {
     }
   };
 
-  const handleOnboardingComplete = () => {
+  const handleOnboardingComplete = async () => {
     try {
-      // Reload user from storage to get updated XP and flags
-      const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      const updated = allUsers.find((u: User) => u.username === currentUser?.username);
+      // Reload user from Supabase to get updated XP and flags
+      const updated = await getCurrentSession();
       if (updated) {
-        setCurrentUser(updated);
+        setCurrentUser(updated as unknown as User);
       }
     } catch (error) {
       console.error('❌ Error completando onboarding:', error);
