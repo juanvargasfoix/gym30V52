@@ -51,16 +51,8 @@ const App: React.FC = () => {
     }
   };
 
-  const handleOnboardingComplete = async () => {
-    try {
-      // Reload user from Supabase to get updated XP and flags
-      const updated = await getCurrentSession();
-      if (updated) {
-        setCurrentUser(updated as unknown as User);
-      }
-    } catch (error) {
-      console.error('❌ Error completando onboarding:', error);
-    }
+  const handleOnboardingComplete = (updatedUser: User) => {
+    setCurrentUser(updatedUser);
   };
 
   if (loading) return <div className="h-screen flex items-center justify-center bg-slate-50"><div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div></div>;

@@ -4,7 +4,7 @@ import { ArrowRight, Check, Sparkles, Map as MapIcon, Award, ChevronRight, Star 
 
 interface OnboardingProps {
   currentUser: User;
-  onComplete: () => void;
+  onComplete: (updatedUser: User) => void;
 }
 
 const profileDescriptions: Record<string, string> = {
@@ -182,19 +182,39 @@ export const Onboarding: React.FC<OnboardingProps> = ({ currentUser, onComplete 
       if (currentUser && currentUser.id) {
         // Al completar onboarding, actualizar el profile del usuario usando updateProfile()
         // Guardamos: onboardingCompleted: true, perfil: { areasInteres: [...] }, perfil_lider y XP
-        await updateProfile(currentUser.id, {
+        const result = await updateProfile(currentUser.id, {
           onboarding_completed: true,
           perfil_lider: `Líder ${finalProfile}`,
           perfil: { areasInteres: selectedAreas },
           xp: (currentUser.xp || 0) + 100 // Bonus de bienvenida
         });
-        console.log('✅ Onboarding completado y guardado en Supabase');
+
+        if (result) {
+          console.log('✅ Onboarding completado y guardado en Supabase');
+
+          // Mapear el resultado de Supabase al tipo User de la app
+          const updatedUser: User = {
+            id: result.id,
+            username: result.email,
+            fullName: result.username,
+            role: result.role,
+            company: result.empresa_id,
+            onboardingCompleted: result.onboarding_completed,
+            leaderProfile: result.perfil_lider,
+            xp: result.xp,
+            rank: result.nivel
+          };
+
+          onComplete(updatedUser);
+          return;
+        }
       }
     } catch (error) {
       console.error('❌ Error guardando onboarding:', error);
     }
 
-    onComplete();
+    // Fallback in case of error (with current data as best effort)
+    onComplete(currentUser);
   };
 
   // --- STEP 1: QUIZ (Enhanced Visuals) ---
