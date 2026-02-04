@@ -72,7 +72,7 @@ const App: React.FC = () => {
     }
 
     if (currentUser.role === 'participante') {
-      if (!currentUser.onboardingCompleted) {
+      if (!(currentUser as any).onboarding_completed) {
         return <Onboarding currentUser={currentUser} onComplete={handleOnboardingComplete} />;
       }
       return <CompetenceMap currentUser={currentUser} onLogout={handleLogout} />;
