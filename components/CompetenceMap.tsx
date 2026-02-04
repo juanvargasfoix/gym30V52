@@ -3,6 +3,8 @@ import { User, Skill, Company, UserProgress, Kudo, FlexArea } from '../types';
 import { calculateRank, ranks } from '../utils/data';
 import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, Brain, Sparkles, Send, User as UserIcon, Lightbulb, BarChart2, Award, TrendingUp, AlertCircle, Star, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles } from '../src/lib/supabase-helpers';
+
 
 interface CompetenceMapProps {
   currentUser: User;
@@ -581,28 +583,79 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   };
 
   useEffect(() => {
-    const allSkills = JSON.parse(localStorage.getItem('skills') || '[]');
-    const companies = JSON.parse(localStorage.getItem('companies') || '[]');
-    const userCompany = companies.find((c: Company) => c.id === currentUser.company);
-    if (userCompany && userCompany.activeAreas.includes('custom')) {
-      const empresaAreas = JSON.parse(localStorage.getItem('empresaAreas') || '{}');
-      const companyConfig = empresaAreas[userCompany.id];
-      if (companyConfig?.flexAreaId) {
-        const library = JSON.parse(localStorage.getItem('flexAreasLibrary') || '[]');
-        const flex = library.find((fa: FlexArea) => fa.id === companyConfig.flexAreaId);
-        setFlexArea(flex || null);
+    const loadAppData = async () => {
+      try {
+        // 1. Get Company from Supabase
+        let userCompany: Company | null = null;
+        const companyId = currentUser.company || (currentUser as any).empresa_id;
+        if (companyId) {
+          const dbCompany = await getCompany(companyId);
+          if (dbCompany) {
+            userCompany = {
+              id: dbCompany.id,
+              name: dbCompany.nombre,
+              activeAreas: dbCompany.areas_activas || [],
+              createdAt: dbCompany.created_at
+            };
+            setCompany(userCompany);
+          }
+        }
+
+        // 2. Get Skills from Supabase
+        const dbSkills = await getSkills(currentUser.company);
+        const mappedSkills: Skill[] = dbSkills.map((s: any) => ({
+          id: s.id,
+          name: s.nombre,
+          area: s.area,
+          description: s.descripcion || '',
+          order: s.nivel || 0,
+          isCustom: s.is_custom || false
+        }));
+
+        if (userCompany) {
+          const active = userCompany.activeAreas || [];
+          // Si la empresa tiene 'custom', permitimos ver todas las skills que no tengan empresa_id o tengan el de la empresa
+          // Pero aquí filtramos por las áreas que la empresa declaró como "activas" en su config de UI
+          const filtered = mappedSkills.filter((s: Skill) => active.includes(s.area));
+          setSkills(filtered);
+        } else {
+          setSkills(mappedSkills);
+        }
+
+        // 3. Get User Progress from Supabase
+        if (currentUser.id) {
+          const progress = await getUserProgress(currentUser.id);
+          // Mapear el progreso de Supabase al formato que espera la app
+          const mappedProgress: UserProgress = {};
+          Object.keys(progress).forEach(skillId => {
+            const p = progress[skillId];
+            mappedProgress[skillId] = {
+              status: p.status === 'completada' ? 'conquered' : p.status,
+              xpEarned: p.xp_ganada || 0,
+              score: p.score,
+              conqueredAt: p.completed_at
+            } as any;
+          });
+          setUserProgress(mappedProgress);
+        }
+
+        // Logic for FlexArea (still from localStorage or library if needed, but keeping existing logic structure)
+        if (userCompany && userCompany.activeAreas.includes('custom')) {
+          const empresaAreas = JSON.parse(localStorage.getItem('empresaAreas') || '{}');
+          const companyConfig = empresaAreas[userCompany.id];
+          if (companyConfig?.flexAreaId) {
+            const library = JSON.parse(localStorage.getItem('flexAreasLibrary') || '[]');
+            const flex = library.find((fa: FlexArea) => fa.id === companyConfig.flexAreaId);
+            setFlexArea(flex || null);
+          }
+        }
+
+      } catch (error) {
+        console.error("❌ Error cargando datos de Supabase en CompetenceMap:", error);
       }
-    }
-    setCompany(userCompany);
-    if (userCompany) {
-      const active = userCompany.activeAreas || [];
-      const filtered = allSkills.filter((s: Skill) => active.includes(s.area));
-      setSkills(filtered);
-    } else {
-      setSkills(allSkills);
-    }
-    const allProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
-    setUserProgress(allProgress[currentUser.username] || {});
+    };
+
+    loadAppData();
   }, [currentUser]);
 
   useEffect(() => {
@@ -633,65 +686,88 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     }
   }, [showProgressDashboard]);
 
-  const calcularDashboardStats = () => {
-    const userProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const companies = JSON.parse(localStorage.getItem('companies') || '[]');
-    const miProgreso = userProgress[currentUser.username] || {};
-    const completadas = Object.values(miProgreso).filter((h: any) => h.status === 'conquered' || h.status === 'completed').length;
-    const countCompletedInArea = (prefix: string) =>
-      Object.keys(miProgreso).filter(id => id.startsWith(prefix) && (miProgreso[id].status === 'conquered' || miProgreso[id].status === 'completed')).length;
-    const porArea = [
-      { nombre: 'Comunicación', completadas: countCompletedInArea('c'), porcentaje: Math.round((countCompletedInArea('c') / 6) * 100), color: 'purple' },
-      { nombre: 'Liderazgo', completadas: countCompletedInArea('l'), porcentaje: Math.round((countCompletedInArea('l') / 6) * 100), color: 'cyan' },
-      { nombre: 'Autoliderazgo', completadas: countCompletedInArea('a'), porcentaje: Math.round((countCompletedInArea('a') / 6) * 100), color: 'green' },
-      { nombre: 'Negociación', completadas: countCompletedInArea('n'), porcentaje: Math.round((countCompletedInArea('n') / 6) * 100), color: 'pink' }
-    ];
-    const badges = [];
-    if (currentUser.onboardingCompleted) badges.push({ emoji: '🌟', nombre: 'Fundacional', descripcion: 'Completaste el onboarding' });
-    Object.entries(miProgreso).forEach(([id, habilidad]) => {
-      const h = habilidad as any;
-      if (h.status === 'conquered' || h.status === 'completed') {
-        const score = h.score || 0;
-        if (score >= 90) badges.push({ emoji: '🏆', nombre: `Maestro: ${id}`, descripcion: `Score ${score}%` });
-      }
-    });
-    const compañeros = users.filter((u: User) => u.role === 'participante' && u.company === currentUser.company).sort((a: User, b: User) => (b.xp || 0) - (a.xp || 0));
-    const ranking = compañeros.map((u: User) => {
-      const progresoU = userProgress[u.username] || {};
-      const habilidadesU = Object.values(progresoU).filter((h: any) => h.status === 'conquered' || h.status === 'completed').length;
-      return {
-        username: u.username,
-        nombre: u.fullName,
-        xp: u.xp || 0,
-        rango: u.rank || 'aprendiz',
-        habilidades: habilidadesU,
-        esUsuarioActual: u.username === currentUser.username
-      };
-    });
-    const habilidadesConScore = (Object.values(miProgreso) as any[]).filter((h: any) => h.score !== undefined);
-    const promedioScores = habilidadesConScore.length > 0 ? Math.round(habilidadesConScore.reduce<number>((acc, h: any) => acc + (Number(h.score) || 0), 0) / habilidadesConScore.length) : 0;
-    const mejorArea = porArea.reduce((max, area) => area.porcentaje > max.porcentaje ? area : max, porArea[0]);
-    const areaFuerte = mejorArea.porcentaje > 0 ? mejorArea.nombre : 'Explorando';
-    const currentRank = calculateRank(currentXP);
-    const allRankNames = ranks.map(r => r.name);
-    const idxActual = currentRank ? allRankNames.indexOf(currentRank.name) : 0;
-    const proximoRango = idxActual < allRankNames.length - 1 ? allRankNames[idxActual + 1] : 'Líder (Máximo)';
-    const nextRank = (idxActual >= 0 && idxActual < ranks.length - 1) ? ranks[idxActual + 1] : null;
-    const xpFaltante = nextRank ? nextRank.min - currentXP : 0;
-    const empresa = companies.find((c: Company) => c.id === currentUser.company);
-    const nombreEmpresa = empresa ? empresa.name : 'Tu Empresa';
-    setDashboardStats({
-      habilidadesCompletadas: completadas,
-      porArea,
-      badges,
-      nombreEmpresa,
-      ranking,
-      promedioScores,
-      areaFuerte,
-      proximoRango: proximoRango.charAt(0).toUpperCase() + proximoRango.slice(1),
-      xpFaltante: Math.max(0, xpFaltante)
-    });
+  const calcularDashboardStats = async () => {
+    const companyId = currentUser.company || (currentUser as any).empresa_id;
+    if (!companyId) return;
+
+    try {
+      // 1. Get all profiles of the same company
+      const companyProfiles = await getAllProfiles(companyId);
+
+      // 2. Get all progress entries for the company
+      const companyProgress = await getCompanyProgress(companyId);
+
+      // 3. Current User Stats
+      const miProgreso = userProgress; // already loaded in useEffect
+      const completadas = Object.values(miProgreso).filter((h: any) => h.status === 'conquered' || h.status === 'completed').length;
+
+      const countCompletedInArea = (prefix: string) =>
+        Object.keys(miProgreso).filter(id => id.startsWith(prefix) && (miProgreso[id].status === 'conquered' || miProgreso[id].status === 'completed')).length;
+
+      const porArea = [
+        { nombre: 'Comunicación', completadas: countCompletedInArea('c'), porcentaje: Math.round((countCompletedInArea('c') / 6) * 100), color: 'purple' },
+        { nombre: 'Liderazgo', completadas: countCompletedInArea('l'), porcentaje: Math.round((countCompletedInArea('l') / 6) * 100), color: 'cyan' },
+        { nombre: 'Autoliderazgo', completadas: countCompletedInArea('a'), porcentaje: Math.round((countCompletedInArea('a') / 6) * 100), color: 'green' },
+        { nombre: 'Negociación', completadas: countCompletedInArea('n'), porcentaje: Math.round((countCompletedInArea('n') / 6) * 100), color: 'pink' }
+      ];
+
+      // 4. Badges
+      const badges = [];
+      if ((currentUser as any).onboarding_completed) badges.push({ emoji: '🌟', nombre: 'Fundacional', descripcion: 'Completaste el onboarding' });
+
+      Object.entries(miProgreso).forEach(([id, habilidad]) => {
+        const h = habilidad as any;
+        if (h.status === 'conquered' || h.status === 'completed') {
+          const score = h.score || 0;
+          if (score >= 90) badges.push({ emoji: '🏆', nombre: `Maestro: ${id}`, descripcion: `Score ${score}%` });
+        }
+      });
+
+      // 5. Ranking
+      const rankingData = companyProfiles.map(u => {
+        const uProgress = companyProgress.filter(p => p.user_id === u.id);
+        const uHabilidades = uProgress.filter(p => p.status === 'completada').length;
+        return {
+          username: u.email,
+          nombre: u.username,
+          xp: u.xp || 0,
+          rango: u.nivel || 'aprendiz',
+          habilidades: uHabilidades,
+          esUsuarioActual: u.id === currentUser.id
+        };
+      }).sort((a, b) => b.xp - a.xp);
+
+      // 6. Scores averages
+      const habilidadesConScore = (Object.values(miProgreso) as any[]).filter((h: any) => h.score !== undefined);
+      const promedioScores = habilidadesConScore.length > 0 ? Math.round(habilidadesConScore.reduce<number>((acc, h: any) => acc + (Number(h.score) || 0), 0) / habilidadesConScore.length) : 0;
+
+      const mejorArea = porArea.reduce((max, area) => area.porcentaje > max.porcentaje ? area : max, porArea[0]);
+      const areaFuerte = mejorArea.porcentaje > 0 ? mejorArea.nombre : 'Explorando';
+
+      const currentRank = calculateRank(currentXP);
+      const allRankNames = ranks.map(r => r.name);
+      const idxActual = currentRank ? allRankNames.indexOf(currentRank.name) : 0;
+      const proximoRango = idxActual < allRankNames.length - 1 ? allRankNames[idxActual + 1] : 'Líder (Máximo)';
+      const nextRank = (idxActual >= 0 && idxActual < ranks.length - 1) ? ranks[idxActual + 1] : null;
+      const xpFaltante = nextRank ? nextRank.min - currentXP : 0;
+
+      const nombreEmpresa = company?.name || 'Tu Empresa';
+
+      setDashboardStats({
+        habilidadesCompletadas: completadas,
+        porArea,
+        badges,
+        nombreEmpresa,
+        ranking: rankingData,
+        promedioScores,
+        areaFuerte,
+        proximoRango: proximoRango.charAt(0).toUpperCase() + proximoRango.slice(1),
+        xpFaltante: Math.max(0, xpFaltante)
+      });
+
+    } catch (error) {
+      console.error("❌ Error calculando stats desde Supabase:", error);
+    }
   };
 
   const getSkillStatus = (skill: Skill) => {
@@ -717,18 +793,36 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     localStorage.setItem('collapsedAreas', JSON.stringify(newCollapsed));
   };
 
-  const completeSkill = (xp: number, score: number = 100) => {
-    if (!selectedSkill) return;
-    const newProgress = { ...userProgress, [selectedSkill.id]: { status: 'conquered' as const, xpEarned: xp, score: score, conqueredAt: new Date().toISOString() } };
-    setUserProgress(newProgress);
-    const allProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
-    allProgress[currentUser.username] = newProgress;
-    localStorage.setItem('userProgress', JSON.stringify(allProgress));
-    const newXP = currentXP + xp;
-    setCurrentXP(newXP);
-    const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    const updatedUsers = allUsers.map((u: User) => u.username === currentUser.username ? { ...u, xp: newXP } : u);
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
+  const completeSkill = async (xp: number, score: number = 100) => {
+    if (!selectedSkill || !currentUser.id) return;
+
+    // 1. Update Progress in Supabase
+    const result = await updateSkillProgress(currentUser.id, selectedSkill.id, 'completada', 100);
+
+    if (result) {
+      // 2. Update Local State
+      const newProgress = {
+        ...userProgress,
+        [selectedSkill.id]: {
+          status: 'conquered' as const,
+          xpEarned: xp,
+          score: score,
+          conqueredAt: new Date().toISOString()
+        }
+      };
+      setUserProgress(newProgress);
+
+      // 3. Update XP in Supabase
+      const newXP = (currentUser.xp || 0) + xp;
+      await updateProfile(currentUser.id, { xp: newXP });
+
+      // 4. Update Local XP State
+      setCurrentXP(newXP);
+
+      console.log('✅ Habilidad completada y guardada en Supabase');
+    } else {
+      console.error('❌ Error guardando progreso en Supabase');
+    }
   };
 
   // ... (Exercise handlers kept as is) ...
@@ -756,12 +850,14 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     if (countWords(textResponse) < 150) return;
     setIsEvaluating(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || 'demo_key' });
+      const ai = new GoogleGenerativeAI(process.env.API_KEY || 'demo_key');
       const prompt = content.evaluatorConfig.promptGenerator(textResponse);
+      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
       let result;
       try {
-        const response = await ai.models.generateContent({ model: 'gemini-3-flash-preview', contents: prompt, config: { responseMimeType: "application/json" } });
-        result = JSON.parse(cleanJSON(response.text || '{}'));
+        const response = await model.generateContent(prompt);
+        const text = response.response.text();
+        result = JSON.parse(cleanJSON(text || '{}'));
       } catch (e) {
         console.log("Mocking AI response", e);
         result = { scores: [85, 90, 80, 85], feedback: "Excelente respuesta demostrando empatía y claridad.", aprobado: true };
@@ -789,12 +885,14 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
       return;
     }
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || 'demo_key' });
+      const ai = new GoogleGenerativeAI(process.env.API_KEY || 'demo_key');
+      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
       let responseText = "...";
       try {
         const prompt = content.promptGenerator(newHistory, chatInput, content.scenario);
-        const response = await ai.models.generateContent({ model: 'gemini-3-flash-preview', contents: prompt, config: { responseMimeType: "application/json" } });
-        const jsonRes = JSON.parse(cleanJSON(response.text || '{}'));
+        const response = await model.generateContent(prompt);
+        const text = response.response.text();
+        const jsonRes = JSON.parse(cleanJSON(text || '{}'));
         responseText = jsonRes.respuesta || "Interesante punto.";
       } catch (e) { responseText = "Entiendo tu punto. ¿Podrías elaborar más?"; }
       setChatHistory([...newHistory, { rol: content.scenario.roleName, texto: responseText }]);
@@ -804,12 +902,13 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   const handleReflectionSubmit = async (content: SkillContentD) => {
     setIsGeneratingInsight(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || 'demo_key' });
+      const ai = new GoogleGenerativeAI(process.env.API_KEY || 'demo_key');
+      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
       const prompt = content.promptGenerator(reflectionAnswers);
       let insight;
       try {
-        const response = await ai.models.generateContent({ model: 'gemini-3-flash-preview', contents: prompt });
-        insight = response.text;
+        const response = await model.generateContent(prompt);
+        insight = response.response.text();
       } catch (e) { insight = "Tus reflexiones demuestran un buen nivel de autoconciencia."; }
       setInsightResult(insight || '');
       completeSkill(50, 100);
