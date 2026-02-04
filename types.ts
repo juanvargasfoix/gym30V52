@@ -3,6 +3,7 @@ export type AreaType = 'comunicacion' | 'liderazgo' | 'autoliderazgo' | 'negocia
 export type SkillStatus = 'locked' | 'available' | 'in_progress' | 'conquered';
 
 export interface User {
+  id?: string;
   username: string;
   password?: string;
   role: Role;
