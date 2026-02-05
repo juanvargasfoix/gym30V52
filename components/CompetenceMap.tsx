@@ -241,9 +241,7 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
     ),
     evaluatorConfig: {
       criteriaNames: ["Especificidad", "Empatía", "Accionabilidad", "Balance"],
-      promptGenerator: (response) => `Eres un coach ejecutivo experto. Evalúa esta respuesta con criterios profesionales.
-RESPUESTA DEL PARTICIPANTE: "${response}"
-Responde SOLO este JSON: { "scores": [85, 70, 90, 80], "feedback": "...", "aprobado": true }`
+      promptGenerator: (response) => `Eres un coach ejecutivo experto en comunicación y liderazgo organizacional. Un participante de un programa de entrenamiento en habilidades blandas debe dar feedback constructivo a un colega. Evalúa su respuesta según estos 4 criterios en escala de 0 a 100: 1. ESPECIFICIDAD (0-100): ¿Menciona comportamientos o situaciones concretas en lugar de generalidades? ¿Evita frases vagas como siempre o nunca? 2. EMPATÍA (0-100): ¿Muestra comprensión por la perspectiva del otro? ¿Usa un tono respetuoso que preserve la relación? 3. ACCIONABILIDAD (0-100): ¿Propone acciones claras y realizables que la persona puede implementar? ¿Va más allá de señalar el problema? 4. BALANCE (0-100): ¿Equilibra el reconocimiento de fortalezas con las áreas de mejora? ¿Evita ser solo crítico o solo elogioso? RESPUESTA DEL PARTICIPANTE: "${response}" Evalúa con rigor profesional. Un score de 90-100 significa excelente, 80-89 muy bien, 70-79 bien, 60-69 puede mejorar, menos de 60 necesita trabajo. Responde SOLO con este JSON sin ningún texto adicional: { "scores": [especificidad, empatia, accionabilidad, balance], "feedback": "Análisis detallado de 2-3 oraciones explicando fortalezas y áreas de mejora específicas", "aprobado": true } El campo aprobado es true si el promedio de scores es mayor a 60.`
     }
   },
   l4: {
@@ -262,7 +260,7 @@ Responde SOLO este JSON: { "scores": [85, 70, 90, 80], "feedback": "...", "aprob
     ),
     evaluatorConfig: {
       criteriaNames: ["Reconocimiento", "Propósito", "Energía", "Inspiración"],
-      promptGenerator: (response) => `Eres un coach de liderazgo. Evalúa este mensaje motivacional. Respuesta: "${response}". Responde SOLO JSON: { "scores": [0, 0, 0, 0], "feedback": "...", "aprobado": true }`
+      promptGenerator: (response) => `Eres un coach de liderazgo experto en comunicación inspiracional y gestión de equipos. Un participante de un programa de entrenamiento debe escribir un mensaje motivacional para su equipo. Evalúa su respuesta según estos 4 criterios en escala de 0 a 100: 1. RECONOCIMIENTO (0-100): ¿Valora los logros o esfuerzos del equipo de manera concreta? ¿Menciona contribuciones específicas? 2. PROPÓSITO (0-100): ¿Conecta el trabajo del equipo con un propósito mayor o una visión compartida? ¿Da sentido al esfuerzo? 3. ENERGÍA (0-100): ¿Transmite entusiasmo y confianza? ¿El tono genera ganas de actuar? ¿Evita ser monótono o burocrático? 4. INSPIRACIÓN (0-100): ¿Motiva a ir más allá? ¿Genera compromiso emocional? ¿Deja al lector con ganas de contribuir? RESPUESTA DEL PARTICIPANTE: "${response}" Evalúa con rigor profesional. Un score de 90-100 significa excelente, 80-89 muy bien, 70-79 bien, 60-69 puede mejorar, menos de 60 necesita trabajo. Responde SOLO con este JSON sin ningún texto adicional: { "scores": [reconocimiento, proposito, energia, inspiracion], "feedback": "Análisis detallado de 2-3 oraciones explicando fortalezas y áreas de mejora específicas", "aprobado": true } El campo aprobado es true si el promedio de scores es mayor a 60.`
     }
   },
   l5: {
@@ -351,7 +349,7 @@ Responde SOLO este JSON: { "scores": [85, 70, 90, 80], "feedback": "...", "aprob
     ),
     evaluatorConfig: {
       criteriaNames: ["Reconocimiento", "Crecimiento", "Acción", "Perspectiva"],
-      promptGenerator: (response) => `Evalúa esta reflexión sobre resiliencia. Respuesta: "${response}". Responde SOLO JSON: { "scores": [0,0,0,0], "feedback": "...", "aprobado": true }`
+      promptGenerator: (response) => `Eres un psicólogo organizacional experto en resiliencia y desarrollo personal. Un participante de un programa de entrenamiento debe reflexionar sobre cómo manejaría una situación de fracaso profesional aplicando resiliencia. Evalúa su respuesta según estos 4 criterios en escala de 0 a 100: 1. RECONOCIMIENTO (0-100): ¿Reconoce el impacto emocional de la situación sin negarlo ni minimizarlo? ¿Muestra autoconciencia sobre sus reacciones? 2. CRECIMIENTO (0-100): ¿Identifica aprendizajes o lecciones concretas de la experiencia? ¿Transforma el fracaso en oportunidad de desarrollo? 3. ACCIÓN (0-100): ¿Propone pasos concretos para avanzar? ¿Define qué haría diferente? ¿Va más allá de la reflexión pasiva? 4. PERSPECTIVA (0-100): ¿Mantiene una visión equilibrada sin catastrofizar ni trivializar? ¿Separa el evento puntual de su valor como profesional? RESPUESTA DEL PARTICIPANTE: "${response}" Evalúa con rigor profesional. Un score de 90-100 significa excelente, 80-89 muy bien, 70-79 bien, 60-69 puede mejorar, menos de 60 necesita trabajo. Responde SOLO con este JSON sin ningún texto adicional: { "scores": [reconocimiento, crecimiento, accion, perspectiva], "feedback": "Análisis detallado de 2-3 oraciones explicando fortalezas y áreas de mejora específicas", "aprobado": true } El campo aprobado es true si el promedio de scores es mayor a 60.`
     }
   },
   a4: {
@@ -368,7 +366,7 @@ Responde SOLO este JSON: { "scores": [85, 70, 90, 80], "feedback": "...", "aprob
     ),
     evaluatorConfig: {
       criteriaNames: ["Clasificación", "Criterio", "Priorización", "Delegación"],
-      promptGenerator: (response) => `Evalúa esta clasificación Eisenhower. Respuesta: "${response}". Responde SOLO JSON: { "scores": [0,0,0,0], "feedback": "...", "aprobado": true }`
+      promptGenerator: (response) => `Eres un experto en productividad, gestión del tiempo y priorización ejecutiva. Un participante de un programa de entrenamiento debe clasificar una lista de tareas usando la Matriz de Eisenhower (Urgente/Importante). Evalúa su respuesta según estos 4 criterios en escala de 0 a 100: 1. CLASIFICACIÓN (0-100): ¿Asigna correctamente cada tarea al cuadrante correspondiente? ¿Distingue bien entre urgente e importante? 2. CRITERIO (0-100): ¿Demuestra comprensión de por qué cada tarea va en su cuadrante? ¿Su razonamiento es sólido y coherente? 3. PRIORIZACIÓN (0-100): ¿Establece un orden lógico de ejecución? ¿Entiende que lo importante-no urgente requiere planificación proactiva? 4. DELEGACIÓN (0-100): ¿Identifica correctamente qué tareas delegar o eliminar? ¿Muestra criterio para soltar lo que no agrega valor? RESPUESTA DEL PARTICIPANTE: "${response}" Evalúa con rigor profesional. Un score de 90-100 significa excelente, 80-89 muy bien, 70-79 bien, 60-69 puede mejorar, menos de 60 necesita trabajo. Responde SOLO con este JSON sin ningún texto adicional: { "scores": [clasificacion, criterio, priorizacion, delegacion], "feedback": "Análisis detallado de 2-3 oraciones explicando fortalezas y áreas de mejora específicas", "aprobado": true } El campo aprobado es true si el promedio de scores es mayor a 60.`
     }
   },
   a5: {
@@ -449,7 +447,7 @@ Responde SOLO este JSON: { "scores": [85, 70, 90, 80], "feedback": "...", "aprob
     ),
     evaluatorConfig: {
       criteriaNames: ["Validación", "Diferenciación", "Evidencia", "Propuesta"],
-      promptGenerator: (response) => `Evalúa esta manejo de objeción. Respuesta: "${response}". Responde SOLO JSON: { "scores": [0,0,0,0], "feedback": "...", "aprobado": true }`
+      promptGenerator: (response) => `Eres un experto en negociación comercial y ventas consultivas con amplia experiencia en manejo de objeciones de precio. Un participante de un programa de entrenamiento debe responder a un cliente que objeta el precio diciendo que la competencia cobra menos. Evalúa su respuesta según estos 4 criterios en escala de 0 a 100: 1. VALIDACIÓN (0-100): ¿Reconoce la preocupación del cliente sin descartarla? ¿Muestra empatía y respeto por su perspectiva? 2. DIFERENCIACIÓN (0-100): ¿Articula claramente qué hace diferente o superior a su propuesta? ¿Va más allá del precio para hablar de valor? 3. EVIDENCIA (0-100): ¿Respalda sus argumentos con datos, ejemplos, casos de éxito o referencias concretas? ¿Es creíble? 4. PROPUESTA (0-100): ¿Ofrece un siguiente paso claro y orientado a la acción? ¿Mantiene el control de la conversación sin ser agresivo? RESPUESTA DEL PARTICIPANTE: "${response}" Evalúa con rigor profesional. Un score de 90-100 significa excelente, 80-89 muy bien, 70-79 bien, 60-69 puede mejorar, menos de 60 necesita trabajo. Responde SOLO con este JSON sin ningún texto adicional: { "scores": [validacion, diferenciacion, evidencia, propuesta], "feedback": "Análisis detallado de 2-3 oraciones explicando fortalezas y áreas de mejora específicas", "aprobado": true } El campo aprobado es true si el promedio de scores es mayor a 60.`
     }
   },
   n4: {
@@ -468,7 +466,7 @@ Responde SOLO este JSON: { "scores": [85, 70, 90, 80], "feedback": "...", "aprob
     ),
     evaluatorConfig: {
       criteriaNames: ["Resumen", "Claridad", "Plazos", "Formalización"],
-      promptGenerator: (response) => `Evalúa este cierre de negociación. Respuesta: "${response}". Responde SOLO JSON: { "scores": [0,0,0,0], "feedback": "...", "aprobado": true }`
+      promptGenerator: (response) => `Eres un experto en negociación comercial y cierre de acuerdos con experiencia en formalización de compromisos empresariales. Un participante de un programa de entrenamiento debe redactar un mensaje de cierre de negociación que formalice los compromisos acordados. Evalúa su respuesta según estos 4 criterios en escala de 0 a 100: 1. RESUMEN (0-100): ¿Recapitula correctamente los puntos clave acordados? ¿Refleja con precisión lo negociado sin omitir elementos importantes? 2. CLARIDAD (0-100): ¿Es claro y sin ambigüedades? ¿Cada compromiso se entiende fácilmente? ¿Evita lenguaje confuso o impreciso? 3. PLAZOS (0-100): ¿Establece fechas, hitos o tiempos concretos? ¿Define cuándo se ejecutará cada compromiso? 4. FORMALIZACIÓN (0-100): ¿Tiene tono profesional adecuado para formalizar un acuerdo? ¿Incluye próximos pasos claros y cierre? RESPUESTA DEL PARTICIPANTE: "${response}" Evalúa con rigor profesional. Un score de 90-100 significa excelente, 80-89 muy bien, 70-79 bien, 60-69 puede mejorar, menos de 60 necesita trabajo. Responde SOLO con este JSON sin ningún texto adicional: { "scores": [resumen, claridad, plazos, formalizacion], "feedback": "Análisis detallado de 2-3 oraciones explicando fortalezas y áreas de mejora específicas", "aprobado": true } El campo aprobado es true si el promedio de scores es mayor a 60.`
     }
   },
   n5: {
