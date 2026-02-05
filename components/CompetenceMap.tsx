@@ -854,7 +854,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     try {
       const ai = new GoogleGenerativeAI(process.env.API_KEY || 'demo_key');
       const prompt = content.evaluatorConfig.promptGenerator(textResponse);
-      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
       let result;
       try {
         const response = await model.generateContent(prompt);
@@ -888,7 +888,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     }
     try {
       const ai = new GoogleGenerativeAI(process.env.API_KEY || 'demo_key');
-      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
       let responseText = "...";
       try {
         const prompt = content.promptGenerator(newHistory, chatInput, content.scenario);
@@ -905,7 +905,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     setIsGeneratingInsight(true);
     try {
       const ai = new GoogleGenerativeAI(process.env.API_KEY || 'demo_key');
-      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
       const prompt = content.promptGenerator(reflectionAnswers);
       let insight;
       try {
