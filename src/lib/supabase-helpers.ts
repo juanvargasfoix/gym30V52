@@ -222,7 +222,7 @@ export const getUserProgress = async (userId: string) => {
 export const updateSkillProgress = async (
     userId: string,
     skillId: string,
-    status: 'bloqueada' | 'disponible' | 'en-progreso' | 'completada',
+    status: 'bloqueada' | 'disponible' | 'en-progreso' | 'completed',
     ejerciciosCompletados?: number
 ) => {
     try {
@@ -241,7 +241,7 @@ export const updateSkillProgress = async (
                 .update({
                     status,
                     ejercicios_completados: ejerciciosCompletados,
-                    completed_at: status === 'completada' ? new Date().toISOString() : null,
+                    completed_at: status === 'completed' ? new Date().toISOString() : null,
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', existing.id)
@@ -259,7 +259,7 @@ export const updateSkillProgress = async (
                     skill_id: skillId,
                     status,
                     ejercicios_completados: ejerciciosCompletados || 0,
-                    completed_at: status === 'completada' ? new Date().toISOString() : null,
+                    completed_at: status === 'completed' ? new Date().toISOString() : null,
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 })

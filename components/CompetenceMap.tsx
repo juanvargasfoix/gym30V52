@@ -631,7 +631,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
           Object.keys(progress).forEach(skillId => {
             const p = progress[skillId];
             mappedProgress[skillId] = {
-              status: p.status === 'completada' ? 'conquered' : p.status,
+              status: (p.status === 'completada' || p.status === 'completed') ? 'conquered' : p.status,
               xpEarned: p.xp_ganada || 0,
               score: p.score,
               conqueredAt: p.completed_at
@@ -799,7 +799,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     if (!selectedSkill || !currentUser.id) return;
 
     // 1. Update Progress in Supabase
-    const result = await updateSkillProgress(currentUser.id, selectedSkill.id, 'completada', 100);
+    const result = await updateSkillProgress(currentUser.id, selectedSkill.id, 'completed', 100);
 
     if (result) {
       // 2. Update Local State
