@@ -852,7 +852,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     if (countWords(textResponse) < 150) return;
     setIsEvaluating(true);
     try {
-      const ai = new GoogleGenAI(process.env.API_KEY || 'demo_key');
+      const ai = new GoogleGenAI(import.meta.env.VITE_GEMINI_API_KEY);
       const prompt = content.evaluatorConfig.promptGenerator(textResponse);
       let result;
       try {
@@ -889,7 +889,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
       return;
     }
     try {
-      const ai = new GoogleGenAI(process.env.API_KEY || 'demo_key');
+      const ai = new GoogleGenAI(import.meta.env.VITE_GEMINI_API_KEY);
       let responseText = "...";
       try {
         const prompt = content.promptGenerator(newHistory, chatInput, content.scenario);
@@ -908,7 +908,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   const handleReflectionSubmit = async (content: SkillContentD) => {
     setIsGeneratingInsight(true);
     try {
-      const ai = new GoogleGenAI(process.env.API_KEY || 'demo_key');
+      const ai = new GoogleGenAI(import.meta.env.VITE_GEMINI_API_KEY);
       const prompt = content.promptGenerator(reflectionAnswers);
       let insight;
       try {
