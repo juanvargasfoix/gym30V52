@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Skill, Company, UserProgress, Kudo, FlexArea } from '../types';
 import { calculateRank, ranks } from '../utils/data';
 import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, Brain, Sparkles, Send, User as UserIcon, Lightbulb, BarChart2, Award, TrendingUp, AlertCircle, Star, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai"
+import { GoogleGenerativeAI } from "@google/generative-ai"
 import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles } from '../src/lib/supabase-helpers';
 
 
@@ -852,15 +852,13 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     if (countWords(textResponse) < 150) return;
     setIsEvaluating(true);
     try {
-      const ai = new GoogleGenAI(import.meta.env.VITE_GEMINI_API_KEY);
+      const ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
       const prompt = content.evaluatorConfig.promptGenerator(textResponse);
       let result;
       try {
-        const response = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
-          contents: [{ role: 'user', parts: [{ text: prompt }] }]
-        });
-        const text = response.text;
+        const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const response = await model.generateContent(prompt);
+        const text = response.response.text();
         result = JSON.parse(cleanJSON(text || '{}'));
       } catch (e) {
         console.log("Mocking AI response", e);
@@ -889,15 +887,13 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
       return;
     }
     try {
-      const ai = new GoogleGenAI(import.meta.env.VITE_GEMINI_API_KEY);
+      const ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
       let responseText = "...";
       try {
         const prompt = content.promptGenerator(newHistory, chatInput, content.scenario);
-        const response = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
-          contents: [{ role: 'user', parts: [{ text: prompt }] }]
-        });
-        const text = response.text;
+        const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const response = await model.generateContent(prompt);
+        const text = response.response.text();
         const jsonRes = JSON.parse(cleanJSON(text || '{}'));
         responseText = jsonRes.respuesta || "Interesante punto.";
       } catch (e) { responseText = "Entiendo tu punto. ¿Podrías elaborar más?"; }
@@ -908,15 +904,13 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   const handleReflectionSubmit = async (content: SkillContentD) => {
     setIsGeneratingInsight(true);
     try {
-      const ai = new GoogleGenAI(import.meta.env.VITE_GEMINI_API_KEY);
+      const ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
       const prompt = content.promptGenerator(reflectionAnswers);
       let insight;
       try {
-        const response = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
-          contents: [{ role: 'user', parts: [{ text: prompt }] }]
-        });
-        insight = response.text;
+        const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const response = await model.generateContent(prompt);
+        insight = response.response.text();
       } catch (e) { insight = "Tus reflexiones demuestran un buen nivel de autoconciencia."; }
       setInsightResult(insight || '');
       completeSkill(50, 100);
