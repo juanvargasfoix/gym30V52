@@ -609,7 +609,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
           area: s.area,
           description: s.descripcion || '',
           order: s.nivel || 0,
-          isCustom: s.is_custom || false
+          isCustom: s.is_custom || false,
+          contentKey: s.content_key || ''
         }));
 
         if (userCompany) {
@@ -673,7 +674,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
       setReflectionAnswers(new Array(3).fill(''));
       setInsightResult(null);
       setViewingChatHistory(false);
-      const content = SKILL_CONTENT[selectedSkill.id];
+      const content = SKILL_CONTENT[selectedSkill.contentKey];
       if (content && content.type === 'C') {
         setChatHistory([{ rol: content.scenario.roleName, texto: content.scenario.initialMessage }]);
       }
@@ -1396,28 +1397,28 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
               </div>
 
               <div className="p-10">
-                {SKILL_CONTENT[selectedSkill.id] ? (
+                {SKILL_CONTENT[selectedSkill.contentKey] ? (
                   <div className="space-y-10">
                     {/* THEORY CARD */}
                     <div className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-lg">
-                      {SKILL_CONTENT[selectedSkill.id].type === 'A' && (SKILL_CONTENT[selectedSkill.id] as SkillContentA).theory}
-                      {SKILL_CONTENT[selectedSkill.id].type === 'B' && (SKILL_CONTENT[selectedSkill.id] as SkillContentB).theory}
-                      {SKILL_CONTENT[selectedSkill.id].type === 'C' && (
+                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'A' && (SKILL_CONTENT[selectedSkill.contentKey] as SkillContentA).theory}
+                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'B' && (SKILL_CONTENT[selectedSkill.contentKey] as SkillContentB).theory}
+                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'C' && (
                         <div>
-                          <div className={`bg-gradient-to-r ${(SKILL_CONTENT[selectedSkill.id] as SkillContentC).scenario.headerGradient} p-8 rounded-2xl text-white mb-6 shadow-lg`}>
-                            <h3 className="text-3xl font-black mb-2">Roleplay: {(SKILL_CONTENT[selectedSkill.id] as SkillContentC).scenario.title}</h3>
-                            <p className="opacity-90 text-lg">{(SKILL_CONTENT[selectedSkill.id] as SkillContentC).scenario.description}</p>
+                          <div className={`bg-gradient-to-r ${(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC).scenario.headerGradient} p-8 rounded-2xl text-white mb-6 shadow-lg`}>
+                            <h3 className="text-3xl font-black mb-2">Roleplay: {(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC).scenario.title}</h3>
+                            <p className="opacity-90 text-lg">{(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC).scenario.description}</p>
                           </div>
                           <div className="flex gap-6 text-sm font-bold text-slate-600 bg-slate-50 p-4 rounded-xl">
-                            <div className="flex items-center gap-2"><UserIcon className="w-5 h-5 text-indigo-500" /> Tu rol: <span className="text-slate-900">{(SKILL_CONTENT[selectedSkill.id] as SkillContentC).scenario.userRole}</span></div>
-                            <div className="flex items-center gap-2"><Award className="w-5 h-5 text-indigo-500" /> Objetivo: <span className="text-slate-900">{(SKILL_CONTENT[selectedSkill.id] as SkillContentC).scenario.goal}</span></div>
+                            <div className="flex items-center gap-2"><UserIcon className="w-5 h-5 text-indigo-500" /> Tu rol: <span className="text-slate-900">{(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC).scenario.userRole}</span></div>
+                            <div className="flex items-center gap-2"><Award className="w-5 h-5 text-indigo-500" /> Objetivo: <span className="text-slate-900">{(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC).scenario.goal}</span></div>
                           </div>
                         </div>
                       )}
-                      {SKILL_CONTENT[selectedSkill.id].type === 'D' && (
+                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'D' && (
                         <div>
-                          <h3 className="text-3xl font-black text-slate-900 mb-4">{(SKILL_CONTENT[selectedSkill.id] as SkillContentD).title}</h3>
-                          <p className="text-lg text-slate-600 leading-relaxed">{(SKILL_CONTENT[selectedSkill.id] as SkillContentD).description}</p>
+                          <h3 className="text-3xl font-black text-slate-900 mb-4">{(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentD).title}</h3>
+                          <p className="text-lg text-slate-600 leading-relaxed">{(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentD).description}</p>
                         </div>
                       )}
                     </div>
@@ -1425,8 +1426,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                     {/* PRACTICE CARD */}
                     <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-200 shadow-inner">
                       {/* TIPO A: LINEAR QUIZ */}
-                      {SKILL_CONTENT[selectedSkill.id].type === 'A' && (() => {
-                        const content = SKILL_CONTENT[selectedSkill.id] as SkillContentA;
+                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'A' && (() => {
+                        const content = SKILL_CONTENT[selectedSkill.contentKey] as SkillContentA;
                         if (quizFinished) {
                           const total = content.quiz.length;
                           const score = quizScore;
@@ -1488,8 +1489,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                       })()}
 
                       {/* TIPO B: TEXTO ABIERTO + ESTRELLAS */}
-                      {SKILL_CONTENT[selectedSkill.id].type === 'B' && (() => {
-                        const content = SKILL_CONTENT[selectedSkill.id] as SkillContentB;
+                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'B' && (() => {
+                        const content = SKILL_CONTENT[selectedSkill.contentKey] as SkillContentB;
                         const wordCount = countWords(textResponse);
                         return (
                           <div className="space-y-6">
@@ -1544,8 +1545,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                       })()}
 
                       {/* TIPO C: CHAT */}
-                      {SKILL_CONTENT[selectedSkill.id].type === 'C' && (() => {
-                        const content = SKILL_CONTENT[selectedSkill.id] as SkillContentC;
+                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'C' && (() => {
+                        const content = SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC;
 
                         // If finished and not viewing history, show Feedback Screen
                         if (chatFinished && !viewingChatHistory) {
@@ -1672,8 +1673,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                       })()}
 
                       {/* TIPO D: REFLEXIÓN */}
-                      {SKILL_CONTENT[selectedSkill.id].type === 'D' && (() => {
-                        const content = SKILL_CONTENT[selectedSkill.id] as SkillContentD;
+                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'D' && (() => {
+                        const content = SKILL_CONTENT[selectedSkill.contentKey] as SkillContentD;
                         const isValid = reflectionAnswers.every(ans => countWords(ans) >= 100);
                         return (
                           <div className="space-y-8">

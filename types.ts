@@ -30,6 +30,7 @@ export interface Skill {
   description: string;
   order: number;
   isCustom: boolean;
+  contentKey: string;
 }
 
 export interface Kudo {
