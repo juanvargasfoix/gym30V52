@@ -67,7 +67,7 @@ interface SkillContentD {
 type SkillContent = SkillContentA | SkillContentB | SkillContentC | SkillContentD;
 
 // --- DATA: SKILL CONTENT MAP ---
-const SKILL_CONTENT: Record<string, SkillContent> = {
+export const SKILL_CONTENT: Record<string, SkillContent> = {
   // --- COMUNICACIÓN (TIPO A) ---
   c1: {
     type: 'A',
@@ -695,7 +695,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
       const companyProfiles = await getAllProfiles(companyId);
 
       // 2. Get all progress entries for the company
-      const companyProgress = await getCompanyProgress(companyId);
+      // const companyProgress = await getCompanyProgress(companyId);
 
       // 3. Current User Stats
       const miProgreso = userProgress; // already loaded in useEffect
@@ -725,8 +725,9 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
 
       // 5. Ranking
       const rankingData = companyProfiles.map(u => {
-        const uProgress = companyProgress.filter(p => p.user_id === u.id);
-        const uHabilidades = uProgress.filter(p => p.status === 'completada').length;
+        // const uProgress = companyProgress.filter(p => p.user_id === u.id);
+        // const uHabilidades = uProgress.filter(p => p.status === 'completada').length;
+        const uHabilidades = 0;
         return {
           username: u.email,
           nombre: u.username,
