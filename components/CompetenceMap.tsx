@@ -799,7 +799,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     if (!selectedSkill || !currentUser.id) return;
 
     // 1. Update Progress in Supabase
-    const result = await updateSkillProgress(currentUser.id, selectedSkill.id, 'completed', 100);
+    const result = await updateSkillProgress(currentUser.id, selectedSkill.id, 'conquered', 100);
 
     if (result) {
       // 2. Update Local State
