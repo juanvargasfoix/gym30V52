@@ -674,7 +674,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   const [isGeneratingInsight, setIsGeneratingInsight] = useState(false);
   const [viewingChatHistory, setViewingChatHistory] = useState(false);
 
-  const isAlreadyCompleted = selectedSkill && userProgress[selectedSkill.id]?.status === 'conquered';
+  const isAlreadyCompleted = selectedSkill && (userProgress[selectedSkill.id]?.status === 'conquered' || userProgress[selectedSkill.id]?.status === 'completed');
 
   useEffect(() => {
     if (currentUser.role !== 'participante') return;
