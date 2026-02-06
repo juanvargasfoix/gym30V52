@@ -1588,6 +1588,11 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                         }
                         return (
                           <div className="space-y-8">
+                            {isAlreadyCompleted && (
+                              <div className="bg-green-50 text-green-700 p-4 rounded-xl font-bold border border-green-200 mb-4 text-center">
+                                ✅ Ya completaste este quiz
+                              </div>
+                            )}
                             <div className="flex justify-between items-center mb-2">
                               <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Progreso</span>
                               <span className="text-sm font-black text-slate-700">{currentQuestionIndex + 1} / {content.quiz.length}</span>
@@ -1598,7 +1603,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                             <h3 className="font-bold text-2xl text-slate-900 leading-snug">{content.quiz[currentQuestionIndex].pregunta}</h3>
                             <div className="space-y-4">
                               {content.quiz[currentQuestionIndex].opciones.map((opt, idx) => (
-                                <button key={idx} onClick={() => handleQuizOptionSelect(idx, content.quiz[currentQuestionIndex].correcta, content.quiz.length)} disabled={selectedQuizOption !== null} className={`w-full text-left p-5 rounded-2xl border-2 transition-all flex justify-between items-center text-lg ${selectedQuizOption === idx ? idx === content.quiz[currentQuestionIndex].correcta ? 'bg-green-50 border-green-500 text-green-800' : 'bg-red-50 border-red-500 text-red-800' : selectedQuizOption !== null && idx === content.quiz[currentQuestionIndex].correcta ? 'bg-green-50 border-green-500 text-green-800' : 'bg-white border-slate-200 hover:border-cyan-400 hover:shadow-md'}`}>
+                                <button key={idx} onClick={() => handleQuizOptionSelect(idx, content.quiz[currentQuestionIndex].correcta, content.quiz.length)} disabled={selectedQuizOption !== null || isAlreadyCompleted} className={`w-full text-left p-5 rounded-2xl border-2 transition-all flex justify-between items-center text-lg ${selectedQuizOption === idx ? idx === content.quiz[currentQuestionIndex].correcta ? 'bg-green-50 border-green-500 text-green-800' : 'bg-red-50 border-red-500 text-red-800' : selectedQuizOption !== null && idx === content.quiz[currentQuestionIndex].correcta ? 'bg-green-50 border-green-500 text-green-800' : 'bg-white border-slate-200 hover:border-cyan-400 hover:shadow-md'} ${isAlreadyCompleted ? 'cursor-not-allowed opacity-70' : ''}`}>
                                   {opt}
                                   {selectedQuizOption === idx && (idx === content.quiz[currentQuestionIndex].correcta ? <CheckCircle className="w-6 h-6" /> : <X className="w-6 h-6" />)}
                                 </button>
