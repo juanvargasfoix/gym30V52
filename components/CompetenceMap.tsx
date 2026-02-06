@@ -796,6 +796,13 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   const completeSkill = async (xp: number, score: number = 100) => {
     if (!selectedSkill || !currentUser.id) return;
 
+    // Verificar si la habilidad ya estaba completada previamente
+    if (userProgress[selectedSkill.id]?.status === 'conquered') {
+      console.log('Habilidad ya completada, XP no sumado');
+      setSelectedSkill(null);
+      return;
+    }
+
     // 1. Update Progress in Supabase
     const result = await updateSkillProgress(currentUser.id, selectedSkill.id, 'conquered', 100);
 
