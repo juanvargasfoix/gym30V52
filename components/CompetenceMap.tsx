@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import React, { useState, useEffect } from 'react';
 import { User, Skill, Company, UserProgress, Kudo, FlexArea } from '../types';
 import { calculateRank, ranks } from '../utils/data';
