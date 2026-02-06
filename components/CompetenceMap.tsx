@@ -674,6 +674,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   const [isGeneratingInsight, setIsGeneratingInsight] = useState(false);
   const [viewingChatHistory, setViewingChatHistory] = useState(false);
 
+  const isAlreadyCompleted = selectedSkill && userProgress[selectedSkill.id]?.status === 'conquered';
+
   useEffect(() => {
     if (currentUser.role !== 'participante') return;
     const storedKudos = JSON.parse(localStorage.getItem('kudos') || '[]');
@@ -915,13 +917,6 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
 
   const completeSkill = async (xp: number, score: number = 100) => {
     if (!selectedSkill || !currentUser.id) return;
-
-    // Verificar si la habilidad ya estaba completada previamente
-    if (userProgress[selectedSkill.id]?.status === 'conquered') {
-      console.log('Habilidad ya completada, XP no sumado');
-      setSelectedSkill(null);
-      return;
-    }
 
     // 1. Update Progress in Supabase
     const result = await updateSkillProgress(currentUser.id, selectedSkill.id, 'conquered', 100);
@@ -1620,13 +1615,30 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                         return (
                           <div className="space-y-6">
                             <h3 className="font-bold text-xl text-slate-800 flex items-center gap-2"><Brain className="w-6 h-6 text-purple-500" /> Tu Respuesta</h3>
-                            <textarea value={textResponse} onChange={(e) => setTextResponse(e.target.value)} placeholder="Escribe tu análisis aquí..." className="w-full h-56 p-6 rounded-2xl border border-slate-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none resize-none text-lg leading-relaxed shadow-sm transition-all" />
+
+                            {isAlreadyCompleted && (
+                              <div className="bg-green-50 text-green-700 p-4 rounded-xl font-bold border border-green-200 mb-2">
+                                ✅ Ya completaste este ejercicio
+                              </div>
+                            )}
+
+                            <textarea
+                              value={textResponse}
+                              onChange={(e) => setTextResponse(e.target.value)}
+                              placeholder="Escribe tu análisis aquí..."
+                              disabled={isAlreadyCompleted}
+                              className="w-full h-56 p-6 rounded-2xl border border-slate-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none resize-none text-lg leading-relaxed shadow-sm transition-all"
+                            />
                             <div className="flex justify-end"><span className={`text-sm font-bold ${wordCount < 150 ? 'text-orange-500' : 'text-green-600'}`}>{wordCount} / 150 palabras</span></div>
 
                             {!evaluationResult ? (
-                              <button onClick={() => handleGeminiEval(content)} disabled={wordCount < 150 || isEvaluating} className="w-full py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-purple-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed">
+                              <button
+                                onClick={() => handleGeminiEval(content)}
+                                disabled={wordCount < 150 || isEvaluating || isAlreadyCompleted}
+                                className="w-full py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-purple-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
                                 {isEvaluating ? <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin" /> : <Sparkles className="w-6 h-6" />}
-                                Enviar mi respuesta ✨
+                                {isAlreadyCompleted ? "Ejercicio Completado" : "Enviar mi respuesta ✨"}
                               </button>
                             ) : (
                               <div className="bg-white p-8 rounded-[2rem] border border-indigo-100 shadow-xl animate-fade-in">
@@ -1752,6 +1764,11 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
 
                             {/* CHAT HISTORY */}
                             <div className="flex-1 bg-slate-50 p-6 overflow-y-auto space-y-6 scroll-smooth">
+                              {isAlreadyCompleted && (
+                                <div className="bg-green-50 text-green-700 p-3 rounded-xl font-bold border border-green-200 text-center mb-4">
+                                  ✅ Ya completaste esta simulación
+                                </div>
+                              )}
                               {chatHistory.map((msg, i) => (
                                 <div key={i} className={`flex ${msg.rol === 'user' ? 'justify-end' : 'justify-start'}`}>
                                   <div className={`max-w-[85%] p-5 rounded-3xl text-lg leading-relaxed shadow-sm ${msg.rol === 'user' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-none'}`}>
@@ -1779,14 +1796,14 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                                   type="text"
                                   value={chatInput}
                                   onChange={(e) => setChatInput(e.target.value)}
-                                  onKeyDown={(e) => e.key === 'Enter' && !chatFinished && handleChatSend(content)}
-                                  placeholder={chatFinished ? "Simulación finalizada" : "Escribe tu respuesta..."}
-                                  disabled={chatFinished}
+                                  onKeyDown={(e) => e.key === 'Enter' && !chatFinished && !isAlreadyCompleted && handleChatSend(content)}
+                                  placeholder={isAlreadyCompleted ? "Ejercicio Completado" : chatFinished ? "Simulación finalizada" : "Escribe tu respuesta..."}
+                                  disabled={chatFinished || isAlreadyCompleted}
                                   className="flex-1 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 ring-indigo-500 text-lg transition-all"
                                 />
                                 <button
                                   onClick={() => handleChatSend(content)}
-                                  disabled={!chatInput.trim() || isTyping || chatFinished}
+                                  disabled={!chatInput.trim() || isTyping || chatFinished || isAlreadyCompleted}
                                   className="p-4 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 disabled:bg-slate-300 transition-colors shadow-lg"
                                 >
                                   <Send className="w-6 h-6" />
@@ -1803,16 +1820,21 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                         const isValid = reflectionAnswers.every(ans => countWords(ans) >= 100);
                         return (
                           <div className="space-y-8">
+                            {isAlreadyCompleted && (
+                              <div className="bg-green-50 text-green-700 p-4 rounded-xl font-bold border border-green-200 text-center">
+                                ✅ Ya completaste esta reflexión
+                              </div>
+                            )}
                             {content.questions.map((q, i) => (
                               <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                                 <label className="block font-bold text-slate-800 mb-4 text-lg">{q}</label>
-                                <textarea className="w-full p-4 bg-slate-50 border-0 rounded-xl focus:ring-2 ring-pink-500 outline-none text-base leading-relaxed" rows={4} value={reflectionAnswers[i] || ''} onChange={(e) => { const newAns = [...reflectionAnswers]; newAns[i] = e.target.value; setReflectionAnswers(newAns); }} placeholder="Escribe tu reflexión..." />
+                                <textarea className="w-full p-4 bg-slate-50 border-0 rounded-xl focus:ring-2 ring-pink-500 outline-none text-base leading-relaxed" rows={4} value={reflectionAnswers[i] || ''} onChange={(e) => { const newAns = [...reflectionAnswers]; newAns[i] = e.target.value; setReflectionAnswers(newAns); }} placeholder="Escribe tu reflexión..." disabled={isAlreadyCompleted} />
                                 <div className={`text-xs text-right mt-2 font-bold ${countWords(reflectionAnswers[i] || '') < 100 ? 'text-orange-500' : 'text-green-600'}`}>{countWords(reflectionAnswers[i] || '')} / 100 palabras</div>
                               </div>
                             ))}
                             {!insightResult ? (
-                              <button onClick={() => handleReflectionSubmit(content)} disabled={!isValid || isGeneratingInsight} className="w-full py-5 bg-pink-500 disabled:bg-slate-300 text-white font-bold rounded-2xl shadow-xl hover:bg-pink-600 transition-all flex justify-center items-center gap-3 text-lg">
-                                {isGeneratingInsight ? <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin" /> : <><Lightbulb className="w-6 h-6" /> Enviar Reflexión</>}
+                              <button onClick={() => handleReflectionSubmit(content)} disabled={!isValid || isGeneratingInsight || isAlreadyCompleted} className="w-full py-5 bg-pink-500 disabled:bg-slate-300 text-white font-bold rounded-2xl shadow-xl hover:bg-pink-600 transition-all flex justify-center items-center gap-3 text-lg">
+                                {isGeneratingInsight ? <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin" /> : <><Lightbulb className="w-6 h-6" /> {isAlreadyCompleted ? "Reflexión Completada" : "Enviar Reflexión"}</>}
                               </button>
                             ) : (
                               <div className="bg-pink-50 p-8 rounded-[2rem] border border-pink-100 animate-fade-in shadow-lg">
