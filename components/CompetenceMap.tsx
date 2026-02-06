@@ -837,6 +837,9 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
 
       // 3. Current User Stats
       const miProgreso = userProgress; // already loaded in useEffect
+      console.log('DEBUG miProgreso:', miProgreso);
+      console.log('DEBUG keys:', Object.keys(miProgreso));
+
       const completadas = Object.values(miProgreso).filter((h: any) => h.status === 'conquered' || h.status === 'completed').length;
 
       const countCompletedInArea = (prefix: string) =>
