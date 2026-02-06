@@ -199,11 +199,31 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
       </div>
     ),
     quiz: [
-      { pregunta: "La empatía compasiva implica:", opciones: ["Solo entender racionalmente", "Sentir y actuar para ayudar", "Ignorar las emociones", "Dar soluciones rápidas"], correcta: 1 },
-      { pregunta: "Para conectar con tu equipo debes:", opciones: ["Mantener distancia profesional siempre", "Validar emociones y escuchar genuinamente", "Ser siempre positivo", "Evitar temas personales"], correcta: 1 },
-      { pregunta: "¿Cuál respuesta muestra empatía?", opciones: ["No es para tanto", "Todos pasamos por eso", "Veo que esto te afecta, cuéntame más", "Tienes que ser más fuerte"], correcta: 2 },
-      { pregunta: "Compartir tu propia vulnerabilidad como líder:", opciones: ["Te debilita", "Genera conexión y confianza", "Es poco profesional", "No importa"], correcta: 1 },
-      { pregunta: "La escucha empática requiere:", opciones: ["Dar consejos rápido", "Interrumpir para ayudar", "Atención plena sin interrumpir", "Cambiar de tema"], correcta: 2 }
+      {
+        pregunta: "Tu colaborador te dice que está agotado pero insiste en que puede terminar el proyecto. ¿Cuál es la respuesta más empática?",
+        opciones: ["Perfecto, confío en ti. Avísame cuando termines.", "Te veo cansado. ¿Qué necesitas para que esto sea manejable?", "Todos estamos cansados, es parte del trabajo.", "Mejor lo termino yo para que descanses."],
+        correcta: 1
+      },
+      {
+        pregunta: "¿Cuál es la diferencia clave entre empatía y simpatía?",
+        opciones: ["La simpatía requiere haber vivido lo mismo; la empatía no.", "La empatía conecta con la emoción del otro; la simpatía la observa desde afuera.", "Son sinónimos usados en contextos diferentes.", "La empatía es profesional; la simpatía es personal."],
+        correcta: 1
+      },
+      {
+        pregunta: "Un miembro del equipo comete un error grave y está visiblemente afectado. ¿Qué haces primero?",
+        opciones: ["Analizar qué salió mal para evitar que se repita.", "Reconocer cómo se siente antes de hablar del error.", "Minimizar el error para que no se sienta tan mal.", "Darle espacio y hablar del tema mañana."],
+        correcta: 1
+      },
+      {
+        pregunta: "¿Por qué mostrar vulnerabilidad como líder puede fortalecer la conexión con el equipo?",
+        opciones: ["Porque demuestra que no tienes todas las respuestas y eso relaja al equipo.", "Porque humaniza la relación y genera confianza para que otros también se abran.", "Porque el equipo sentirá lástima y trabajará más duro.", "No la fortalece; los líderes deben proyectar seguridad siempre."],
+        correcta: 1
+      },
+      {
+        pregunta: "Alguien te cuenta un problema personal que afecta su trabajo. ¿Cuál respuesta cierra la conversación en lugar de abrirla?",
+        opciones: ["Gracias por contarme. ¿Cómo puedo apoyarte?", "Entiendo que es difícil. ¿Qué es lo que más te preocupa?", "No te preocupes, todos pasamos por cosas así.", "¿Quieres contarme más sobre lo que está pasando?"],
+        correcta: 2
+      }
     ]
   },
   l2: {
@@ -218,11 +238,31 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
       </div>
     ),
     quiz: [
-      { pregunta: "Delegar efectivamente significa:", opciones: ["Deshacerte de lo que no quieres hacer", "Empoderar y desarrollar a otros", "Controlar cada paso", "Asignar solo tareas simples"], correcta: 1 },
-      { pregunta: "El nivel más alto de delegación es:", opciones: ["Haz exactamente esto", "Recomienda qué hacer", "Actúa libremente, informa si hay problema", "Pide permiso para todo"], correcta: 2 },
-      { pregunta: "Al delegar debes dar:", opciones: ["Solo la tarea", "Tarea + contexto + recursos + autoridad", "Órdenes estrictas", "Libertad total sin guía"], correcta: 1 },
-      { pregunta: "Un error común al delegar es:", opciones: ["Dar contexto del por qué", "Reconocer el esfuerzo", "Micromanagear cada paso", "Confiar en el equipo"], correcta: 2 },
-      { pregunta: "Si alguien logra el resultado de forma diferente a la tuya:", opciones: ["Corregir su método", "Celebrar el resultado logrado", "Criticar el proceso", "Hacerlo tú la próxima vez"], correcta: 1 }
+      {
+        pregunta: "Delegas una tarea importante y tu colaborador la resuelve de forma diferente a como tú lo habrías hecho, pero el resultado es bueno. ¿Qué haces?",
+        opciones: ["Le explicas cómo lo habrías hecho tú para la próxima vez.", "Reconoces el resultado y le preguntas qué aprendió del proceso.", "Corriges el método para que siga el estándar del equipo.", "No dices nada para no desmotivarlo."],
+        correcta: 1
+      },
+      {
+        pregunta: "¿Cuál de estas situaciones indica que estás microgestionando?",
+        opciones: ["Pides una actualización semanal del avance.", "Defines el objetivo y dejas que elijan cómo lograrlo.", "Revisas cada paso antes de que continúen al siguiente.", "Ofreces ayuda si encuentran obstáculos."],
+        correcta: 2
+      },
+      {
+        pregunta: "Al delegar, ¿qué elemento es MÁS importante para el éxito de la tarea?",
+        opciones: ["Instrucciones detalladas paso a paso.", "Claridad sobre el resultado esperado y el contexto del por qué.", "Supervisión frecuente del progreso.", "Elegir a la persona con más experiencia."],
+        correcta: 1
+      },
+      {
+        pregunta: "Un colaborador junior te pide que revises cada decisión antes de avanzar. ¿Cómo fomentas su autonomía?",
+        opciones: ["Le dices que confíe más en sí mismo y decida solo.", "Defines criterios claros para qué decisiones puede tomar solo y cuáles consultar.", "Sigues revisando todo hasta que tenga más experiencia.", "Le asignas tareas más simples que no requieran decisiones."],
+        correcta: 1
+      },
+      {
+        pregunta: "¿Cuál es el riesgo principal de NO delegar lo suficiente?",
+        opciones: ["El equipo comete más errores por falta de guía.", "Te conviertes en cuello de botella y el equipo no se desarrolla.", "Pierdes control sobre la calidad del trabajo.", "El equipo se siente demasiado presionado."],
+        correcta: 1
+      }
     ]
   },
   l3: {
@@ -307,11 +347,31 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
       </div>
     ),
     quiz: [
-      { pregunta: "El autoconocimiento te permite:", opciones: ["Evitar tus debilidades", "Identificar patrones para gestionarlos mejor", "Ser perfecto en todo", "No necesitar feedback de otros"], correcta: 1 },
-      { pregunta: "Una práctica efectiva de autoconocimiento es:", opciones: ["Ignorar lo que no te gusta de ti", "Solo enfocarte en fortalezas", "Reflexionar después de eventos importantes", "Evitar el feedback de otros"], correcta: 2 },
-      { pregunta: "Tus 'triggers emocionales' son:", opciones: ["Situaciones que te activan emocionalmente", "Tus fortalezas principales", "Cosas que no te importan", "Objetivos profesionales"], correcta: 0 },
-      { pregunta: "El feedback 360° es útil porque:", opciones: ["Solo te dice lo que haces bien", "Te da perspectivas que no ves en ti mismo", "Es opcional para el autoconocimiento", "Reemplaza tu autoreflexión"], correcta: 1 },
-      { pregunta: "Una persona con alto autoconocimiento:", opciones: ["Nunca comete errores", "No necesita mejorar en nada", "Reconoce sus patrones y puede ajustarlos", "Evitar situaciones desafiantes"], correcta: 2 }
+      {
+        pregunta: "Notas que reaccionas con irritación cada vez que alguien cuestiona tus ideas en reuniones. Esto probablemente indica:",
+        opciones: ["Que tus colegas son irrespetuosos.", "Un trigger emocional relacionado con sentirte desafiado.", "Que necesitas mejores argumentos para tus ideas.", "Que las reuniones no son el espacio adecuado para debatir."],
+        correcta: 1
+      },
+      {
+        pregunta: "¿Cuál es la principal limitación de la autoevaluación sin feedback externo?",
+        opciones: ["Es más lenta que pedir feedback.", "No identifica fortalezas, solo debilidades.", "Tiene puntos ciegos que solo otros pueden ver.", "Genera demasiada autocrítica."],
+        correcta: 2
+      },
+      {
+        pregunta: "Después de una presentación que no salió bien, ¿cuál reflexión demuestra mayor autoconocimiento?",
+        opciones: ["El público no estaba interesado en el tema.", "Me preparé poco porque subestimé la complejidad.", "Fue mala suerte, la tecnología falló en el peor momento.", "Debería evitar presentar en el futuro."],
+        correcta: 1
+      },
+      {
+        pregunta: "¿Para qué sirve identificar tus 'triggers emocionales'?",
+        opciones: ["Para evitar las situaciones que los activan.", "Para anticipar tu reacción y elegir una respuesta más consciente.", "Para explicar a otros por qué reaccionas así.", "Para justificar comportamientos impulsivos."],
+        correcta: 1
+      },
+      {
+        pregunta: "Un colega te dice que a veces pareces distante en las reuniones. Tú no lo percibías así. ¿Qué haces?",
+        opciones: ["Le explicas que simplemente estás concentrado.", "Ignoras el comentario porque no coincide con tu autoimagen.", "Exploras con curiosidad qué comportamientos dan esa impresión.", "Cambias tu comportamiento inmediatamente para agradar."],
+        correcta: 2
+      }
     ]
   },
   a2: {
@@ -326,11 +386,31 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
       </div>
     ),
     quiz: [
-      { pregunta: "Gestionar emociones significa:", opciones: ["Suprimirlas y no sentirlas", "Reconocerlas y regularlas conscientemente", "Expresarlas siempre inmediatamente", "Ignorarlas hasta que pasen"], correcta: 1 },
-      { pregunta: "La 'pausa de 6 segundos' sirve para:", opciones: ["Evitar sentir la emoción", "Crear espacio entre estímulo y respuesta", "Olvidar lo que pasó", "Reprimir la emoción"], correcta: 1 },
-      { pregunta: "¿Cuál es una respuesta emocionalmente gestionada?", opciones: ["Explotar inmediatamente", "Guardar todo hasta que explotes después", "Reconocer la emoción y expresarla constructivamente", "Fingir que nada te afecta"], correcta: 2 },
-      { pregunta: "El reencuadre cognitivo consiste en:", opciones: ["Negar la realidad", "Ver la situación desde otra perspectiva", "Culpar a otros", "Evitar pensar en ello"], correcta: 1 },
-      { pregunta: "Una emoción bien gestionada:", opciones: ["Desaparece instantáneamente", "Se comunica en el momento y forma adecuada", "Nunca se expresa", "Se vuelve más intensa"], correcta: 1 }
+      {
+        pregunta: "Recibes un email que te molesta mucho. La 'pausa de 6 segundos' te ayuda a:",
+        opciones: ["Olvidar el email y seguir con otra cosa.", "Crear espacio para responder en lugar de reaccionar.", "Calmarte completamente antes de actuar.", "Analizar racionalmente si tu molestia es válida."],
+        correcta: 1
+      },
+      {
+        pregunta: "¿Cuál es la diferencia entre suprimir una emoción y regularla?",
+        opciones: ["Suprimir es más efectivo a corto plazo; regular a largo plazo.", "Regular implica reconocerla y canalizarla; suprimir es negarla o esconderla.", "Son lo mismo pero con diferentes nombres.", "Suprimir es consciente; regular es automático."],
+        correcta: 1
+      },
+      {
+        pregunta: "Tu jefe critica tu trabajo frente al equipo. Sientes vergüenza e ira. ¿Cuál es una respuesta emocionalmente regulada?",
+        opciones: ["Defenderte inmediatamente explicando tu posición.", "No decir nada y procesar la emoción después en privado.", "Agradecer el feedback y pedir hablar en privado sobre los detalles.", "Mostrar que no te afectó para no parecer vulnerable."],
+        correcta: 2
+      },
+      {
+        pregunta: "El 'reencuadre cognitivo' ante un proyecto cancelado sería:",
+        opciones: ["Convencerte de que no querías ese proyecto de todas formas.", "Buscar qué aprendiste y qué oportunidades abre esta situación.", "Culpar a factores externos para no sentirte mal.", "Enfocarte en el siguiente proyecto sin pensar en este."],
+        correcta: 1
+      },
+      {
+        pregunta: "¿Cuál de estos comportamientos indica BAJA gestión emocional?",
+        opciones: ["Pedir un momento antes de responder cuando estás alterado.", "Expresar frustración de forma directa pero respetuosa.", "Acumular molestias sin expresarlas hasta explotar.", "Reconocer que algo te afectó y necesitas procesarlo."],
+        correcta: 2
+      }
     ]
   },
   a3: {
@@ -405,11 +485,31 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
       </div>
     ),
     quiz: [
-      { pregunta: "El enfoque Win-Win en negociación significa:", opciones: ["Yo gano, tú pierdes", "Buscar acuerdos que beneficien a ambas partes", "Ceder en todo para mantener la relación", "Imponer mi solución de forma amable"], correcta: 1 },
-      { pregunta: "Separar personas del problema implica:", opciones: ["Ignorar las emociones del otro", "Ser duro con las personas", "Atacar el desafío, no a la persona", "Evitar el conflicto siempre"], correcta: 2 },
-      { pregunta: "BATNA es:", opciones: ["Tu posición inicial en la negociación", "Tu mejor alternativa si no hay acuerdo", "El objetivo ideal que buscas", "Una técnica de persuasión"], correcta: 1 },
-      { pregunta: "Enfocarse en intereses vs posiciones significa:", opciones: ["Mantener firme tu posición inicial", "Preguntar 'por qué' quiere eso", "Ceder rápido en tus posiciones", "Negociar solo en términos de precio"], correcta: 1 },
-      { pregunta: "Los criterios objetivos en negociación son útiles para:", opciones: ["Imponer tu punto de vista", "Evitar negociar", "Basar decisiones en estándares justos", "Manipular al otro"], correcta: 2 }
+      {
+        pregunta: "En una negociación, la otra parte insiste en su posición sin explicar por qué. ¿Qué pregunta ayuda a descubrir sus intereses reales?",
+        opciones: ["¿Es tu última oferta?", "¿Qué es lo que realmente necesitas lograr con esto?", "¿Puedes ceder un poco en ese punto?", "¿Por qué no aceptas mi propuesta?"],
+        correcta: 1
+      },
+      {
+        pregunta: "Tu BATNA (mejor alternativa) es débil. ¿Cómo afecta esto tu negociación?",
+        opciones: ["No afecta si no lo mencionas.", "Tienes menos poder para rechazar ofertas desfavorables.", "Debes ser más agresivo para compensar.", "Es mejor no negociar hasta tener un BATNA fuerte."],
+        correcta: 1
+      },
+      {
+        pregunta: "¿Qué significa 'separar a las personas del problema'?",
+        opciones: ["Negociar solo por email para evitar emociones.", "No tomar los desacuerdos como ataques personales.", "Ignorar las preocupaciones emocionales del otro.", "Delegar la negociación a alguien sin relación personal."],
+        correcta: 1
+      },
+      {
+        pregunta: "Un acuerdo Win-Win implica que:",
+        opciones: ["Ambos ceden exactamente lo mismo.", "Ambos sienten que ganaron más de lo que perdieron.", "Nadie obtiene todo lo que quería.", "Se divide todo en partes iguales."],
+        correcta: 1
+      },
+      {
+        pregunta: "Usar 'criterios objetivos' en una negociación ayuda a:",
+        opciones: ["Demostrar que tienes razón.", "Presionar al otro con datos.", "Basar el acuerdo en estándares justos, no en voluntades.", "Evitar la negociación emocional."],
+        correcta: 2
+      }
     ]
   },
   n2: {
@@ -424,11 +524,31 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
       </div>
     ),
     quiz: [
-      { pregunta: "La preparación en negociación es importante porque:", opciones: ["Improvisar genera mejores resultados", "Te permite identificar opciones y límites claros", "Es opcional si eres buen negociador", "Solo la usa el lado más débil"], correcta: 1 },
-      { pregunta: "ZOPA (Zona de Posible Acuerdo) es:", opciones: ["Tu posición inicial", "El rango donde ambos pueden estar satisfechos", "Una técnica de presión", "El mínimo que aceptas"], correcta: 1 },
-      { pregunta: "Si no hay ZOPA en una negociación:", opciones: ["Debes ceder más", "Presionas al otro", "Usas tu BATNA", "Terminas la relación"], correcta: 2 },
-      { pregunta: "Investigar a la otra parte sirve para:", opciones: ["Encontrar sus debilidades y atacarlas", "Comprender sus intereses y generar opciones", "Copiar su estrategia", "Intimidarlos con información"], correcta: 1 },
-      { pregunta: "Preparar opciones creativas antes de negociar:", opciones: ["Te hace parecer débil", "No es necesario si conoces tu objetivo", "Aumenta posibilidades de acuerdo Win-Win", "Confunde a la otra parte"], correcta: 2 }
+      {
+        pregunta: "Antes de negociar, investigas que la otra empresa tiene urgencia por cerrar este trimestre. Esta información te sirve para:",
+        opciones: ["Presionarlos con plazos ajustados.", "Entender su contexto y buscar opciones que resuelvan su urgencia.", "Pedir más porque sabes que aceptarán.", "Alargar la negociación para aumentar su presión."],
+        correcta: 1
+      },
+      {
+        pregunta: "La ZOPA (Zona de Posible Acuerdo) NO existe cuando:",
+        opciones: ["Ambas partes tienen posiciones muy diferentes.", "El mínimo aceptable de uno supera el máximo del otro.", "Hay desconfianza entre las partes.", "No se conocen los intereses del otro."],
+        correcta: 1
+      },
+      {
+        pregunta: "¿Por qué es importante definir tu 'punto de retiro' antes de negociar?",
+        opciones: ["Para comunicárselo al otro y fijar límites claros.", "Para saber cuándo aceptar cualquier oferta.", "Para evitar aceptar acuerdos peores que tu alternativa.", "Para tener un argumento de presión."],
+        correcta: 2
+      },
+      {
+        pregunta: "Preparar múltiples opciones creativas antes de negociar te permite:",
+        opciones: ["Confundir al otro con demasiadas propuestas.", "Mostrar flexibilidad y encontrar acuerdos inesperados.", "Evitar que el otro proponga sus propias ideas.", "Alargar la negociación para ganar tiempo."],
+        correcta: 1
+      },
+      {
+        pregunta: "Descubres que tu contraparte valora mucho algo que a ti te cuesta poco dar. Esto es:",
+        opciones: ["Una oportunidad para pedir algo grande a cambio.", "Una oportunidad para crear valor mutuo fácilmente.", "Información que debes ocultar para no perder ventaja.", "Irrelevante si no estaba en tu lista de temas."],
+        correcta: 1
+      }
     ]
   },
   n3: {
