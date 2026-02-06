@@ -162,7 +162,7 @@ Responde EN PERSONAJE como Sofía. Responde SOLO JSON: { "respuesta": "texto de 
   },
   c5: {
     type: 'B',
-    minLength: 150,
+    minLength: 100,
     theory: (
       <div className='prose prose-lg text-slate-700'>
         <h3 className='text-2xl font-bold text-slate-900 mb-4'>🎯 Ejercicio Práctico: Conversaciones para la Acción</h3>
@@ -822,7 +822,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     if (showProgressDashboard) {
       calcularDashboardStats();
     }
-  }, [showProgressDashboard]);
+  }, [showProgressDashboard, userProgress]);
 
   const calcularDashboardStats = async () => {
     const companyId = currentUser.company || (currentUser as any).empresa_id;
