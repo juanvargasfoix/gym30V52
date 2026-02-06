@@ -111,7 +111,7 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
   },
   c3: {
     type: 'B',
-    minLength: 150,
+    minLength: 100,
     theory: (
       <div className='prose prose-lg text-slate-700'>
         <h3 className='text-2xl font-bold text-slate-900 mb-4'>🎯 Ejercicio Práctico: Escucha Activa</h3>
