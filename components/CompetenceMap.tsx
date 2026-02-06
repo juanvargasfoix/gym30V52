@@ -52,6 +52,7 @@ interface SkillContentC {
     userRole: string;
     personality: string;
     situation: string;
+    evaluationCriteria?: string[];
   };
   promptGenerator: (history: { rol: string, texto: string }[], lastUserMessage: string, scenario: any) => string;
 };
@@ -145,7 +146,8 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
       initialMessage: 'Hola, ¿tienes un minuto? Quería comentarte algo... bueno, no sé si es importante, pero últimamente me siento un poco... no sé cómo explicarlo.',
       userRole: 'Líder',
       personality: 'Insegura, evasiva al principio, pero se abre si se siente escuchada. Responde mejor a preguntas abiertas que a consejos.',
-      situation: 'Sofía está desmotivada pero no sabe identificar la causa. Necesita que alguien le ayude a reflexionar con buenas preguntas, no que le den soluciones.'
+      situation: 'Sofía está desmotivada pero no sabe identificar la causa. Necesita que alguien le ayude a reflexionar con buenas preguntas, no que le den soluciones.',
+      evaluationCriteria: ['Preguntas Abiertas', 'Escucha Activa', 'Profundización']
     },
     promptGenerator: (history, lastUserMessage, scenario) => `Eres ${scenario.roleName}, una colaboradora que necesita ayuda para reflexionar sobre su situación. ${scenario.personality} Situación: ${scenario.situation}. 
 
@@ -1723,18 +1725,16 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-lg w-full max-w-lg mb-8 text-left">
                                 <h4 className="font-bold text-slate-800 mb-4 border-b pb-2">📊 Evaluación de Desempeño</h4>
                                 <div className="space-y-3 mb-6">
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-sm font-medium text-slate-600">Comunicación</span>
-                                    <div className="flex text-yellow-400"><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 text-slate-200" /></div>
-                                  </div>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-sm font-medium text-slate-600">Negociación</span>
-                                    <div className="flex text-yellow-400"><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /></div>
-                                  </div>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-sm font-medium text-slate-600">Manejo de Objeciones</span>
-                                    <div className="flex text-yellow-400"><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 text-slate-200" /></div>
-                                  </div>
+                                  {(content.scenario.evaluationCriteria || ['Comunicación', 'Negociación', 'Manejo de Objeciones']).map((criterion, idx) => (
+                                    <div key={idx} className="flex justify-between items-center">
+                                      <span className="text-sm font-medium text-slate-600">{criterion}</span>
+                                      <div className="flex text-yellow-400">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                          <Star key={star} className={`w-4 h-4 ${star <= (idx === 0 ? 5 : 4) ? 'fill-current' : 'text-slate-200'}`} />
+                                        ))}
+                                      </div>
+                                    </div>
+                                  ))}
                                 </div>
                                 <div className="bg-indigo-50 p-4 rounded-xl">
                                   <p className="text-xs font-bold text-indigo-500 uppercase mb-1">💬 Feedback del Coach</p>
