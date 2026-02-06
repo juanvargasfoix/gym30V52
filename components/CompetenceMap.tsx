@@ -765,8 +765,9 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
           const progress = await getUserProgress(currentUser.id);
           // Mapear el progreso de Supabase al formato que espera la app
           const mappedProgress: UserProgress = {};
-          Object.keys(progress).forEach(skillId => {
-            const p = progress[skillId];
+          Object.keys(progress).forEach(key => {
+            const p = progress[key];
+            const skillId = p.skill_id || key;
             mappedProgress[skillId] = {
               status: (p.status === 'completada' || p.status === 'completed') ? 'conquered' : p.status,
               xpEarned: p.xp_ganada || 0,
