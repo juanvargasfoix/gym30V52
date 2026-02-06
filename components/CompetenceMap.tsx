@@ -741,7 +741,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
         // 2. Get Skills from Supabase
         const dbSkills = await getSkills(currentUser.company);
         const mappedSkills: Skill[] = dbSkills.map((s: any) => ({
-          id: s.id,
+          id: s.content_key || s.id,
           name: s.nombre,
           area: s.area,
           description: s.descripcion || '',
