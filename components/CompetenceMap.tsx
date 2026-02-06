@@ -83,107 +83,122 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
       </div>
     ),
     quiz: [
-      { pregunta: "¿Cuál de las siguientes es un JUICIO?", opciones: ["María es una excelente líder", "María coordinó 3 proyectos exitosos", "María tiene 5 años en la empresa", "María reportó los resultados ayer"], correcta: 0 },
-      { pregunta: "Un HECHO se caracteriza por ser:", opciones: ["Una opinión personal", "Verificable y objetivo", "Una promesa a futuro", "Una interpretación"], correcta: 1 },
-      { pregunta: "¿Cuál es una DECLARACIÓN?", opciones: ["Creo que funcionará", "El proyecto está atrasado", "Te declaro aprobado", "Probablemente llueva"], correcta: 2 },
-      { pregunta: "Transformar 'Pedro es conflictivo' a un hecho sería:", opciones: ["Pedro siempre causa problemas", "Pedro tuvo 2 desacuerdos esta semana", "Pedro tiene mala actitud", "Pedro no colabora"], correcta: 1 },
-      { pregunta: "Las distinciones del lenguaje nos ayudan a:", opciones: ["Hablar más rápido", "Evitar conversaciones", "Comunicarnos con mayor precisión", "Dar órdenes efectivas"], correcta: 2 }
+      { pregunta: "Tu jefe dice 'Juan es muy lento con los reportes'. Esto es:", opciones: ["Un hecho porque lo dice el jefe", "Un juicio que requiere evidencia", "Una declaración oficial", "Un pedido implícito"], correcta: 1 },
+      { pregunta: "¿Cuál de estas frases es un HECHO verificable?", opciones: ["El cliente está molesto con nosotros", "La reunión duró 47 minutos", "Este proyecto va a fracasar", "Somos el mejor equipo"], correcta: 1 },
+      { pregunta: "En una reunión dices: 'A partir de hoy, María lidera el proyecto'. Esto es:", opciones: ["Un juicio sobre María", "Un hecho observable", "Una declaración que crea realidad", "Una opinión personal"], correcta: 2 },
+      { pregunta: "Un colega dice 'Siempre llegas tarde'. Para convertirlo en hecho dirías:", opciones: ["Es verdad, soy impuntual", "Llegué 10 minutos tarde el lunes y miércoles", "No es cierto, exageras", "Tú también llegas tarde"], correcta: 1 },
+      { pregunta: "¿Por qué distinguir entre juicios y hechos mejora la comunicación?", opciones: ["Permite ganar discusiones más fácilmente", "Evita malentendidos basados en interpretaciones", "Hace que otros acepten tu opinión", "Demuestra quién tiene la razón"], correcta: 1 }
     ]
   },
   c2: {
-    type: 'A',
+    type: 'B',
+    minLength: 150,
     theory: (
-      <div className="prose prose-lg text-slate-700">
-        <p className="mb-4">Los actos lingüísticos son acciones que realizamos al hablar. No solo describimos la realidad, sino que la creamos.</p>
-        <h3 className="text-xl font-bold text-slate-900 mb-2 mt-6">📌 Los 5 Actos Lingüísticos:</h3>
-        <ul className="list-disc pl-5 space-y-1 mb-6">
-          <li>Afirmaciones, Declaraciones, Pedidos, Ofertas, Promesas.</li>
-        </ul>
-      </div>
-    ),
-    quiz: [
-      { pregunta: "¿Cuál es un ejemplo de DECLARACIÓN?", opciones: ["El proyecto avanza bien", "Te nombro coordinador del equipo", "¿Puedes ayudarme?", "Terminaré esto hoy"], correcta: 1 },
-      { pregunta: "Un PEDIDO se caracteriza por:", opciones: ["Describir una situación", "Comprometerse a algo", "Solicitar algo a alguien", "Ofrecer ayuda"], correcta: 2 },
-      { pregunta: "'Terminaré el informe el viernes' es un ejemplo de:", opciones: ["Afirmación", "Pedido", "Promesa", "Declaración"], correcta: 2 },
-      { pregunta: "Una OFERTA es:", opciones: ["Pedir algo a otro", "Proponer algo a alguien", "Describir un hecho", "Crear nueva realidad"], correcta: 1 },
-      { pregunta: "¿Cuál NO es un acto lingüístico?", opciones: ["Pedidos", "Promesas", "Suposiciones", "Ofertas"], correcta: 2 }
-    ]
-  },
-  c3: {
-    type: 'A',
-    theory: (
-      <div className="prose prose-lg text-slate-700">
-        <p className="mb-4">La escucha activa va más allá de oír palabras. Es comprender el mundo del otro.</p>
-        <h3 className="text-xl font-bold text-slate-900 mb-2 mt-6">📌 Niveles de Escucha:</h3>
-        <ul className="list-disc pl-5 space-y-1 mb-6">
-          <li>Pasiva, Activa, Ontológica.</li>
-        </ul>
-      </div>
-    ),
-    quiz: [
-      { pregunta: "La escucha ontológica busca comprender:", opciones: ["Solo las palabras que dice", "El SER de la persona", "Los datos objetivos", "Las tareas pendientes"], correcta: 1 },
-      { pregunta: "Parafrasear en la escucha activa significa:", opciones: ["Repetir exactamente lo mismo", "Reformular con tus palabras para confirmar", "Cambiar el tema", "Dar tu opinión"], correcta: 1 },
-      { pregunta: "¿Cuál es una barrera para la escucha activa?", opciones: ["Hacer preguntas", "Contacto visual", "Juzgar mientras escuchas", "Tomar notas"], correcta: 2 },
-      { pregunta: "Una pregunta de escucha activa sería:", opciones: ["Deberías hacer esto", "Yo en tu lugar haría", "¿Qué es lo que más te preocupa?", "Eso está mal"], correcta: 2 },
-      { pregunta: "El lenguaje corporal en la escucha activa debe ser:", opciones: ["Cerrado y defensivo", "Abierto y receptivo", "Distraído", "No importa"], correcta: 1 }
-    ]
-  },
-  c4: {
-    type: 'A',
-    theory: (
-      <div className="prose prose-lg text-slate-700">
-        <p className="mb-4">La indagación es el arte de hacer preguntas poderosas.</p>
-        <h3 className="text-xl font-bold text-slate-900 mb-2 mt-6">📌 Tipos de Preguntas:</h3>
-        <ul className="list-disc pl-5 space-y-1 mb-6">
-          <li>Cerradas, Abiertas, Poderosas.</li>
-        </ul>
-      </div>
-    ),
-    quiz: [
-      { pregunta: "Una pregunta PODEROSA es:", opciones: ["¿Terminaste o no?", "¿Por qué no lo hiciste?", "¿Qué aprendiste de esta experiencia?", "Deberías hacer esto, ¿verdad?"], correcta: 2 },
-      { pregunta: "Las preguntas cerradas:", opciones: ["Invitan a reflexionar profundamente", "Solo admiten sí/no", "Son las más poderosas", "Generan nuevas posibilidades"], correcta: 1 },
-      { pregunta: "¿Cuál pregunta genera más reflexión?", opciones: ["¿Lo lograste?", "¿Hiciste lo que te pedí?", "¿Qué obstáculos encontraste?", "¿Sí o no?"], correcta: 2 },
-      { pregunta: "Una buena pregunta de indagación debe:", opciones: ["Juzgar al otro", "Tener respuesta obvia", "Empoderar y abrir posibilidades", "Ser rápida de responder"], correcta: 2 },
-      { pregunta: "'¿Qué te impide lograrlo?' es una pregunta:", opciones: ["Cerrada", "Poderosa", "Básica", "Inútil"], correcta: 1 }
-    ]
-  },
-  c5: {
-    type: 'A',
-    theory: (
-      <div className="prose prose-lg text-slate-700">
-        <p className="mb-4">Las conversaciones para la acción nos permiten coordinar tareas y compromisos.</p>
-        <h3 className="text-xl font-bold text-slate-900 mb-2 mt-6">📌 Ciclo de Coordinación:</h3>
-        <ul className="list-disc pl-5 space-y-1 mb-6">
-          <li>Preparación → Pedido/Oferta → Negociación → Promesa → Ejecución → Satisfacción</li>
-        </ul>
-      </div>
-    ),
-    quiz: [
-      { pregunta: "El ciclo de coordinación comienza con:", opciones: ["Una promesa", "Una preparación", "Una declaración", "Una ejecución"], correcta: 1 },
-      { pregunta: "La negociación en el ciclo sirve para:", opciones: ["Evitar el compromiso", "Acordar condiciones satisfactorias", "Cancelar el pedido", "Juzgar al otro"], correcta: 1 },
-      { pregunta: "Una conversación para coordinación efectiva requiere:", opciones: ["Solo dar órdenes", "Evitar compromisos claros", "Pedidos y promesas claras", "Ambigüedad en los plazos"], correcta: 2 },
-      { pregunta: "La declaración de satisfacción ocurre:", opciones: ["Al inicio", "Durante la negociación", "Al completar la tarea", "No es necesaria"], correcta: 2 },
-      { pregunta: "¿Qué pasa si no hay promesa clara?", opciones: ["Todo fluye mejor", "Hay confusión y conflictos", "No importa", "Se mejora la comunicación"], correcta: 1 }
-    ]
-  },
-  c6: {
-    type: 'A',
-    theory: (
-      <div className="prose prose-lg text-slate-700">
-        <p className="mb-4">La comunicación asertiva es expresar tus ideas, necesidades y emociones de manera clara y respetuosa.</p>
-        <h3 className="text-xl font-bold text-slate-900 mb-2 mt-6">💡 Fórmula Asertiva:</h3>
-        <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-100 font-medium text-indigo-900 mb-4">
-          "Cuando [conducta], me siento [emoción], porque [razón]. Necesito/Propongo [petición]"
+      <div className='prose prose-lg text-slate-700'>
+        <h3 className='text-2xl font-bold text-slate-900 mb-4'>🎯 Ejercicio Práctico: Actos Lingüísticos</h3>
+        <div className='bg-green-50 p-6 rounded-xl border border-green-100'>
+          <p className='font-bold text-green-900 mb-2'>Situación:</p>
+          <p className='text-green-800'>Tu equipo no cumplió una entrega importante. Debes comunicarte con ellos para: (1) hacer una declaración sobre la situación, (2) hacer un pedido claro para la próxima entrega, y (3) obtener una promesa de compromiso.</p>
+          <p className='mt-4 font-bold text-green-900 mb-2'>Tu tarea:</p>
+          <p className='text-green-800'>Escribe el mensaje que enviarías a tu equipo incluyendo los tres actos lingüísticos: declaración, pedido y promesa esperada.</p>
         </div>
       </div>
     ),
-    quiz: [
-      { pregunta: "La comunicación asertiva busca:", opciones: ["Imponer tu punto de vista", "Evitar conflictos callándote", "Expresar respetando a ambos", "Ser siempre amable aunque te moleste"], correcta: 2 },
-      { pregunta: "¿Cuál es un ejemplo de comunicación asertiva?", opciones: ["Como tú digas...", "¡Tú nunca entiendes!", "Me siento incómodo con esto, propongo que...", "No importa lo que piense"], correcta: 2 },
-      { pregunta: "La comunicación pasiva se caracteriza por:", opciones: ["Expresar claramente tus necesidades", "No expresar lo que piensas o sientes", "Ser agresivo", "Ser directo"], correcta: 1 },
-      { pregunta: "Decir 'Cuando llegas tarde, me preocupo' es:", opciones: ["Agresivo", "Pasivo", "Asertivo", "Manipulador"], correcta: 2 },
-      { pregunta: "La asertividad requiere:", opciones: ["Gritar para que te escuchen", "Callarte tus opiniones", "Claridad y respeto mutuo", "Evitar a toda costa el conflicto"], correcta: 2 }
-    ]
+    evaluatorConfig: {
+      criteriaNames: ['Declaración', 'Pedido', 'Promesa', 'Claridad'],
+      promptGenerator: (response) => `Eres un experto en ontología del lenguaje y comunicación organizacional. Un participante debe escribir un mensaje a su equipo que incluya tres actos lingüísticos: una declaración, un pedido y una solicitud de promesa. Evalúa su respuesta según estos 4 criterios en escala de 0 a 100: 1. DECLARACIÓN (0-100): ¿Incluye una declaración clara que establece una nueva realidad o posición? ¿Tiene autoridad y es apropiada al contexto? 2. PEDIDO (0-100): ¿Hace un pedido específico con condiciones claras (qué, quién, cuándo)? ¿Es un pedido genuino que permite negociación? 3. PROMESA (0-100): ¿Solicita o facilita una promesa de compromiso del equipo? ¿Crea condiciones para que el otro se comprometa? 4. CLARIDAD (0-100): ¿El mensaje es claro, profesional y mantiene la relación? ¿Evita ambigüedades y resentimientos? RESPUESTA DEL PARTICIPANTE: "${response}" Evalúa con rigor profesional. Un score de 90-100 significa excelente, 80-89 muy bien, 70-79 bien, 60-69 puede mejorar, menos de 60 necesita trabajo. Responde SOLO con este JSON sin ningún texto adicional: { "scores": [declaracion, pedido, promesa, claridad], "feedback": "Análisis detallado de 2-3 oraciones explicando fortalezas y áreas de mejora específicas", "aprobado": true } El campo aprobado es true si el promedio de scores es mayor a 60.`
+    }
+  },
+  c3: {
+    type: 'B',
+    minLength: 150,
+    theory: (
+      <div className='prose prose-lg text-slate-700'>
+        <h3 className='text-2xl font-bold text-slate-900 mb-4'>🎯 Ejercicio Práctico: Escucha Activa</h3>
+        <div className='bg-green-50 p-6 rounded-xl border border-green-100'>
+          <p className='font-bold text-green-900 mb-2'>Situación:</p>
+          <p className='text-green-800 mb-3'>Lee esta conversación entre un líder (L) y su colaborador (C):</p>
+          <div className='bg-white p-4 rounded-lg text-sm space-y-2 border'>
+            <p><strong>C:</strong> "Estoy agotado. Llevo tres semanas con este proyecto y siento que no avanzo."</p>
+            <p><strong>L:</strong> "Bueno, todos estamos ocupados. ¿Ya probaste organizarte mejor?"</p>
+            <p><strong>C:</strong> "No es tema de organización... es que cada vez agregan más requisitos."</p>
+            <p><strong>L:</strong> "Eso pasa siempre. Enfócate en lo importante y delega lo demás."</p>
+          </div>
+          <p className='mt-4 font-bold text-green-900 mb-2'>Tu tarea:</p>
+          <p className='text-green-800'>Analiza qué hizo mal el líder en términos de escucha activa, y reescribe sus dos respuestas aplicando técnicas de escucha activa (validar, parafrasear, preguntar).</p>
+        </div>
+      </div>
+    ),
+    evaluatorConfig: {
+      criteriaNames: ['Diagnóstico', 'Validación', 'Parafraseo', 'Indagación'],
+      promptGenerator: (response) => `Eres un experto en comunicación y escucha activa. Un participante debe analizar una conversación donde el líder no escuchó bien, y reescribir las respuestas aplicando escucha activa. Evalúa su respuesta según estos 4 criterios en escala de 0 a 100: 1. DIAGNÓSTICO (0-100): ¿Identifica correctamente los errores del líder? ¿Menciona que no validó emociones, interrumpió, dio consejos prematuros o no indagó? 2. VALIDACIÓN (0-100): ¿Las respuestas reescritas validan las emociones del colaborador? ¿Reconocen el agotamiento y la frustración sin minimizarlos? 3. PARAFRASEO (0-100): ¿Incluye parafraseo que demuestre comprensión? ¿Reformula lo que dijo el colaborador para confirmar entendimiento? 4. INDAGACIÓN (0-100): ¿Hace preguntas abiertas que inviten a profundizar? ¿Evita preguntas cerradas o que suenen a reproche? RESPUESTA DEL PARTICIPANTE: "${response}" Evalúa con rigor profesional. Un score de 90-100 significa excelente, 80-89 muy bien, 70-79 bien, 60-69 puede mejorar, menos de 60 necesita trabajo. Responde SOLO con este JSON sin ningún texto adicional: { "scores": [diagnostico, validacion, parafraseo, indagacion], "feedback": "Análisis detallado de 2-3 oraciones explicando fortalezas y áreas de mejora específicas", "aprobado": true } El campo aprobado es true si el promedio de scores es mayor a 60.`
+    }
+  },
+  c4: {
+    type: 'C',
+    scenario: {
+      roleName: 'Sofía Méndez',
+      title: 'Práctica de Indagación',
+      description: 'Tu colaboradora tiene un problema pero no lo expresa claramente.',
+      goal: 'Usar preguntas poderosas para ayudarla a reflexionar',
+      headerGradient: 'from-blue-500 to-cyan-500',
+      initialMessage: 'Hola, ¿tienes un minuto? Quería comentarte algo... bueno, no sé si es importante, pero últimamente me siento un poco... no sé cómo explicarlo.',
+      userRole: 'Líder',
+      personality: 'Insegura, evasiva al principio, pero se abre si se siente escuchada. Responde mejor a preguntas abiertas que a consejos.',
+      situation: 'Sofía está desmotivada pero no sabe identificar la causa. Necesita que alguien le ayude a reflexionar con buenas preguntas, no que le den soluciones.'
+    },
+    promptGenerator: (history, lastUserMessage, scenario) => `Eres ${scenario.roleName}, una colaboradora que necesita ayuda para reflexionar sobre su situación. ${scenario.personality} Situación: ${scenario.situation}. 
+
+IMPORTANTE: Evalúa si el usuario hace preguntas poderosas (abiertas, reflexivas) o si da consejos/soluciones directas.
+- Si hace preguntas abiertas y reflexivas: ábrete más, reflexiona en voz alta, muestra progreso.
+- Si da consejos o soluciones: responde con evasivas como "sí, puede ser..." pero sin abrirte realmente.
+- Si hace preguntas cerradas (sí/no): responde brevemente sin profundizar.
+
+Historial: ${JSON.stringify(history)}. Usuario dice: "${lastUserMessage}". 
+
+Responde EN PERSONAJE como Sofía. Responde SOLO JSON: { "respuesta": "texto de 1-3 oraciones", "score": numero del 0-100 basado en la calidad de indagación del usuario }`
+  },
+  c5: {
+    type: 'B',
+    minLength: 150,
+    theory: (
+      <div className='prose prose-lg text-slate-700'>
+        <h3 className='text-2xl font-bold text-slate-900 mb-4'>🎯 Ejercicio Práctico: Conversaciones para la Acción</h3>
+        <div className='bg-green-50 p-6 rounded-xl border border-green-100'>
+          <p className='font-bold text-green-900 mb-2'>Situación:</p>
+          <p className='text-green-800 mb-3'>Necesitas que el área de Sistemas implemente una nueva funcionalidad en el software antes del 15 del próximo mes. El líder de Sistemas es conocido por tener muchas prioridades y decir que sí a todo pero luego no cumplir.</p>
+          <p className='mt-4 font-bold text-green-900 mb-2'>Tu tarea:</p>
+          <p className='text-green-800'>Escribe el mensaje o conversación donde: (1) preparas el contexto, (2) haces un pedido claro y específico, (3) negocias condiciones de satisfacción, y (4) buscas obtener una promesa genuina con fecha y condiciones.</p>
+        </div>
+      </div>
+    ),
+    evaluatorConfig: {
+      criteriaNames: ['Preparación', 'Pedido', 'Negociación', 'Promesa'],
+      promptGenerator: (response) => `Eres un experto en coordinación de acciones y comunicación efectiva basada en actos del habla. Un participante debe escribir una conversación para coordinar una acción con otra área. Evalúa su respuesta según estos 4 criterios en escala de 0 a 100: 1. PREPARACIÓN (0-100): ¿Establece contexto claro del por qué es importante? ¿Genera un espacio propicio para el pedido? 2. PEDIDO (0-100): ¿El pedido es específico con qué, quién, cuándo y condiciones de satisfacción? ¿Deja espacio para que el otro pueda negociar o declinar? 3. NEGOCIACIÓN (0-100): ¿Anticipa posibles obstáculos? ¿Muestra flexibilidad para negociar condiciones sin perder lo esencial? 4. PROMESA (0-100): ¿Busca obtener un compromiso explícito? ¿Establece mecanismos de seguimiento o confirmación? RESPUESTA DEL PARTICIPANTE: "${response}" Evalúa con rigor profesional. Un score de 90-100 significa excelente, 80-89 muy bien, 70-79 bien, 60-69 puede mejorar, menos de 60 necesita trabajo. Responde SOLO con este JSON sin ningún texto adicional: { "scores": [preparacion, pedido, negociacion, promesa], "feedback": "Análisis detallado de 2-3 oraciones explicando fortalezas y áreas de mejora específicas", "aprobado": true } El campo aprobado es true si el promedio de scores es mayor a 60.`
+    }
+  },
+  c6: {
+    type: 'D',
+    title: 'Comunicación Asertiva',
+    description: 'La asertividad es expresar tus necesidades y opiniones respetando a los demás.',
+    questions: [
+      'Describe una situación reciente donde no dijiste lo que realmente pensabas o sentías. ¿Qué te frenó?',
+      'Piensa en alguien que consideras asertivo. ¿Qué hace diferente a ti en situaciones similares?',
+      '¿Qué frase o mensaje te gustaría poder decir con más frecuencia en tu trabajo? ¿A quién y en qué contexto?'
+    ],
+    promptGenerator: (answers) => `Eres un coach experto en comunicación asertiva y desarrollo personal. Lee estas reflexiones de un participante:
+
+Reflexión 1 (situación donde no se expresó): "${answers[0]}"
+Reflexión 2 (modelo de asertividad): "${answers[1]}"
+Reflexión 3 (mensaje pendiente): "${answers[2]}"
+
+Genera un insight personalizado de 3-4 oraciones que:
+1. Conecte las tres reflexiones identificando un patrón o creencia limitante
+2. Valide su experiencia sin juzgar
+3. Ofrezca una perspectiva nueva sobre la asertividad
+4. Sugiera un pequeño paso concreto que pueda dar esta semana
+
+Tono cálido, empático y motivador. No uses listas, escribe en prosa fluida.`
   },
 
   // --- LIDERAZGO ---
