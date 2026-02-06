@@ -740,7 +740,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
 
         // 2. Get Skills from Supabase
         const dbSkills = await getSkills(currentUser.company);
-        const mappedSkills: Skill[] = dbSkills.map((s: any) => ({
+        const mappedSkills: any[] = dbSkills.map((s: any) => ({
+          uuid: s.id,
           id: s.content_key || s.id,
           name: s.nombre,
           area: s.area,
@@ -844,7 +845,11 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
       const completadas = Object.values(miProgreso).filter((h: any) => h.status === 'conquered' || h.status === 'completed').length;
 
       const countCompletedInArea = (prefix: string) =>
-        Object.keys(miProgreso).filter(id => id.startsWith(prefix) && (miProgreso[id].status === 'conquered' || miProgreso[id].status === 'completed')).length;
+        Object.keys(miProgreso).filter(key => {
+          const skill = skills.find((s: any) => s.uuid === key || s.id === key);
+          const skillId = skill ? skill.id : key;
+          return skillId && skillId.startsWith(prefix) && (miProgreso[key].status === 'conquered' || miProgreso[key].status === 'completed');
+        }).length;
 
       const porArea = [
         { nombre: 'Comunicación', completadas: countCompletedInArea('c'), porcentaje: Math.round((countCompletedInArea('c') / 6) * 100), color: 'purple' },
