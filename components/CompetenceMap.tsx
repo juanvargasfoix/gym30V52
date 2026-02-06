@@ -946,7 +946,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     if (!selectedSkill || !currentUser.id) return;
 
     // 1. Update Progress in Supabase
-    const result = await updateSkillProgress(currentUser.id, selectedSkill.id, 'conquered', 100);
+    const skillUuid = (skills.find(s => s.id === selectedSkill.id) as any)?.uuid || selectedSkill.id;
+    const result = await updateSkillProgress(currentUser.id, skillUuid, 'conquered', 100);
 
     if (result) {
       // 2. Update Local State
