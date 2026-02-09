@@ -777,11 +777,16 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
         if (currentUser.id) {
           const progress = await getUserProgress(currentUser.id);
           // Mapear el progreso de Supabase al formato que espera la app
+          // IMPORTANTE: progress viene indexado por skill UUID, pero la app usa content_key como skill.id
+          // Necesitamos traducir UUID -> content_key para que getSkillStatus() funcione correctamente
           const mappedProgress: UserProgress = {};
           Object.keys(progress).forEach(key => {
             const p = progress[key];
-            const skillId = p.skill_id || key;
-            mappedProgress[skillId] = {
+            const skillUuid = p.skill_id || key;
+            // Buscar la skill por UUID para obtener su content_key
+            const matchingSkill = mappedSkills.find((s: any) => s.uuid === skillUuid);
+            const progressKey = matchingSkill ? matchingSkill.id : skillUuid;
+            mappedProgress[progressKey] = {
               status: (p.status === 'completada' || p.status === 'completed') ? 'conquered' : p.status,
               xpEarned: p.xp_ganada || 0,
               score: p.score,
