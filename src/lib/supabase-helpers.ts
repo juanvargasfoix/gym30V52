@@ -379,3 +379,98 @@ export const getAllKudos = async (empresaId?: string) => {
         return []
     }
 }
+
+// ==================== GYM CONFIG ====================
+export const getGymConfig = async () => {
+    try {
+        const { data, error } = await supabase
+            .from('gym_config')
+            .select('*')
+            .limit(1)
+            .single()
+
+        if (error) throw error
+        return data?.config || null
+    } catch (error) {
+        console.error('Error getting gym config:', error)
+        return null
+    }
+}
+
+export const updateGymConfig = async (config: any) => {
+    try {
+        // Obtener el id del registro existente
+        const { data: existing } = await supabase
+            .from('gym_config')
+            .select('id')
+            .limit(1)
+            .single()
+
+        if (existing) {
+            const { data, error } = await supabase
+                .from('gym_config')
+                .update({
+                    config,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', existing.id)
+                .select()
+                .single()
+
+            if (error) throw error
+            return data
+        } else {
+            const { data, error } = await supabase
+                .from('gym_config')
+                .insert({
+                    config,
+                    updated_at: new Date().toISOString()
+                })
+                .select()
+                .single()
+
+            if (error) throw error
+            return data
+        }
+    } catch (error) {
+        console.error('Error updating gym config:', error)
+        return null
+    }
+}
+
+// ==================== FLEX AREA CONFIG (per company) ====================
+export const getCompanyFlexConfig = async (companyId: string) => {
+    try {
+        const { data, error } = await supabase
+            .from('companies')
+            .select('flex_area_config')
+            .eq('id', companyId)
+            .single()
+
+        if (error) throw error
+        return data?.flex_area_config || null
+    } catch (error) {
+        console.error('Error getting company flex config:', error)
+        return null
+    }
+}
+
+export const updateCompanyFlexConfig = async (companyId: string, flexConfig: any) => {
+    try {
+        const { data, error } = await supabase
+            .from('companies')
+            .update({
+                flex_area_config: flexConfig,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', companyId)
+            .select()
+            .single()
+
+        if (error) throw error
+        return data
+    } catch (error) {
+        console.error('Error updating company flex config:', error)
+        return null
+    }
+}

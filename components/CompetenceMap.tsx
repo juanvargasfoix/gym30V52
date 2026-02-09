@@ -4,7 +4,7 @@ import { User, Skill, Company, UserProgress, Kudo, FlexArea } from '../types';
 import { calculateRank, ranks } from '../utils/data';
 import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, Brain, Sparkles, Send, User as UserIcon, Lightbulb, BarChart2, Award, TrendingUp, AlertCircle, Star, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
 import { GoogleGenerativeAI } from "@google/generative-ai"
-import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles } from '../src/lib/supabase-helpers';
+import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles, getKudos, getCompanyFlexConfig } from '../src/lib/supabase-helpers';
 
 
 interface CompetenceMapProps {
@@ -695,21 +695,32 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   const isAlreadyCompleted = selectedSkill && (userProgress[selectedSkill.id]?.status === 'conquered' || userProgress[selectedSkill.id]?.status === 'completed');
 
   useEffect(() => {
-    if (currentUser.role !== 'participante') return;
-    const storedKudos = JSON.parse(localStorage.getItem('kudos') || '[]');
-    const leidos = JSON.parse(localStorage.getItem('kudosLeidos') || '[]');
-    const misKudos = storedKudos.filter((k: any) =>
-      k.to === currentUser.username || k.to === 'todos' || k.to === 'Todo el Equipo'
-    ).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    setKudosRecibidos(misKudos);
-    const unreadCount = misKudos.filter((k: any) => !leidos.includes(k.id)).length;
-    setKudosNoLeidos(unreadCount);
-    if (unreadCount > 0 && !sessionStorage.getItem('kudosModalShown')) {
-      setTimeout(() => {
-        setShowKudosModal(true);
-        sessionStorage.setItem('kudosModalShown', 'true');
-      }, 1500);
-    }
+    if (currentUser.role !== 'participante' || !currentUser.id) return;
+    const loadKudos = async () => {
+      // Cargar kudos desde Supabase
+      const dbKudos = await getKudos(currentUser.id!);
+      const misKudos: Kudo[] = (dbKudos || []).map((k: any) => ({
+        id: k.id,
+        from: k.from_user_id || '',
+        to: currentUser.username,
+        message: k.message,
+        value: 'Reconocimiento',
+        createdAt: k.created_at,
+      })).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setKudosRecibidos(misKudos);
+
+      // kudosLeidos se mantiene en localStorage (preferencia UI local)
+      const leidos = JSON.parse(localStorage.getItem('kudosLeidos') || '[]');
+      const unreadCount = misKudos.filter((k: any) => !leidos.includes(k.id)).length;
+      setKudosNoLeidos(unreadCount);
+      if (unreadCount > 0 && !sessionStorage.getItem('kudosModalShown')) {
+        setTimeout(() => {
+          setShowKudosModal(true);
+          sessionStorage.setItem('kudosModalShown', 'true');
+        }, 1500);
+      }
+    };
+    loadKudos();
   }, [currentUser]);
 
   const marcarKudosComoLeidos = () => {
@@ -780,14 +791,11 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
           setUserProgress(mappedProgress);
         }
 
-        // Logic for FlexArea (still from localStorage or library if needed, but keeping existing logic structure)
-        if (userCompany && userCompany.activeAreas.includes('custom')) {
-          const empresaAreas = JSON.parse(localStorage.getItem('empresaAreas') || '{}');
-          const companyConfig = empresaAreas[userCompany.id];
-          if (companyConfig?.flexAreaId) {
-            const library = JSON.parse(localStorage.getItem('flexAreasLibrary') || '[]');
-            const flex = library.find((fa: FlexArea) => fa.id === companyConfig.flexAreaId);
-            setFlexArea(flex || null);
+        // Logic for FlexArea - cargar desde Supabase (company.flex_area_config)
+        if (userCompany && userCompany.activeAreas.includes('custom') && companyId) {
+          const flexConfig = await getCompanyFlexConfig(companyId);
+          if (flexConfig) {
+            setFlexArea(flexConfig as FlexArea);
           }
         }
 

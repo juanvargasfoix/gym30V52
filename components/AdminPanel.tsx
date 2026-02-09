@@ -7,7 +7,12 @@ import {
     updateProfile,
     getCompanies,
     createCompany,
-    updateCompany
+    updateCompany,
+    getSkills,
+    createCustomSkill,
+    getGymConfig,
+    updateGymConfig,
+    updateCompanyFlexConfig
 } from '../src/lib/supabase-helpers';
 
 interface AdminPanelProps {
@@ -110,16 +115,29 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                 }));
                 setUsers(mappedUsers);
 
-                // 3. Fetch Skills (Still from localStorage for now, but referenced users/companies are removed)
-                setSkills(JSON.parse(localStorage.getItem('skills') || '[]'));
+                // 3. Fetch Skills from Supabase
+                const dbSkills = await getSkills();
+                const mappedSkills: Skill[] = dbSkills.map((s: any) => ({
+                    id: s.id,
+                    area: s.area,
+                    name: s.nombre,
+                    description: s.descripcion || '',
+                    order: s.nivel || 0,
+                    isCustom: s.is_custom || false,
+                    contentKey: s.content_key || ''
+                }));
+                setSkills(mappedSkills);
 
-                // Load Configs
-                const savedConfig = localStorage.getItem('configGym30');
-                if (savedConfig) setGymConfig(JSON.parse(savedConfig));
+                // Load Gym Config from Supabase
+                const savedConfig = await getGymConfig();
+                if (savedConfig) setGymConfig(savedConfig);
 
-                // Load Flex Library
-                const savedLibrary = JSON.parse(localStorage.getItem('flexAreasLibrary') || '[]');
-                setFlexLibrary(savedLibrary);
+                // Load Flex Library - ahora se almacena por empresa en flex_area_config
+                // Mantenemos flexLibrary como array local construido desde las companies
+                const flexFromCompanies = dbCompanies
+                    .filter((c: any) => c.flex_area_config)
+                    .map((c: any) => c.flex_area_config);
+                setFlexLibrary(flexFromCompanies);
 
                 console.log('✅ PANEL ADMIN CARGADO DESDE SUPABASE');
 
@@ -133,21 +151,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
 
     // --- SAVE HANDLERS ---
 
-    const saveGymConfig = () => {
-        console.log('💾 GUARDANDO CONFIGURACIÓN GYM 3.0');
+    const saveGymConfig = async () => {
+        console.log('💾 GUARDANDO CONFIGURACIÓN GYM 3.0 EN SUPABASE');
         console.log('📊 Datos guardados:', gymConfig);
 
-        localStorage.setItem('configGym30', JSON.stringify(gymConfig));
+        await updateGymConfig(gymConfig);
 
-        console.log('✅ Configuración guardada en localStorage');
-        console.log('🎉 Mostrando mensaje de confirmación');
+        console.log('✅ Configuración guardada en Supabase');
 
         setIsSavingConfig(true);
         setTimeout(() => setIsSavingConfig(false), 2000);
     };
 
     const saveFlexTemplate = () => {
-        console.log('📚 PASO 1/3: Convirtiendo FLEX a plantillas');
+        console.log('📚 Guardando plantilla FLEX en estado local');
 
         if (!currentTemplate.name) {
             alert('El nombre del área es obligatorio');
@@ -157,10 +174,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
         let updatedLibrary: FlexArea[];
 
         if (isEditing) {
-            // Update existing
             updatedLibrary = flexLibrary.map(t => t.id === currentTemplate.id ? currentTemplate : t);
         } else {
-            // Create new
             const newTemplate = {
                 ...currentTemplate,
                 id: `flex-${Date.now()}`
@@ -169,14 +184,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
         }
 
         setFlexLibrary(updatedLibrary);
-        localStorage.setItem('flexAreasLibrary', JSON.stringify(updatedLibrary));
+        // Nota: las flex areas se guardan en Supabase cuando se asignan a una empresa (updateCompanyFlexConfig)
 
-        // LOGS SOLICITADOS
-        console.log('💾 Guardando en: flexAreasLibrary (global)');
         console.log('✅ Área FLEX creada como plantilla:', currentTemplate.name);
         console.log('📋 Total plantillas FLEX:', updatedLibrary.length);
 
-        // Reset Form
         setCurrentTemplate({
             id: '',
             name: '',
@@ -191,7 +203,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
     const deleteFlexTemplate = (id: string) => {
         const updatedLibrary = flexLibrary.filter(t => t.id !== id);
         setFlexLibrary(updatedLibrary);
-        localStorage.setItem('flexAreasLibrary', JSON.stringify(updatedLibrary));
     };
 
     const editFlexTemplate = (template: FlexArea) => {
@@ -244,7 +255,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
         } catch (e) { console.error(e); }
     };
     const saveSkills = (newS: Skill[]) => {
-        try { setSkills(newS); localStorage.setItem('skills', JSON.stringify(newS)); } catch (e) { console.error(e); }
+        try { setSkills(newS); } catch (e) { console.error(e); }
     };
 
     const handleCreateCompany = async () => {
@@ -566,10 +577,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                                                             setEditingCompanyId(c.id);
                                                             setTempActiveAreas(c.activeAreas);
 
-                                                            // Load specific company flex config
-                                                            const empresaAreas = JSON.parse(localStorage.getItem('empresaAreas') || '{}');
-                                                            const companyConfig = empresaAreas[c.id];
-                                                            setTempFlexAreaId(companyConfig?.flexAreaId || '');
+                                                            // Load specific company flex config from Supabase data
+                                                            // flex_area_config ya viene cargado desde companies
+                                                            const companyData = companies.find(co => co.id === c.id);
+                                                            setTempFlexAreaId((companyData as any)?.flexAreaId || '');
                                                         }}
                                                         className="px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg font-medium transition-colors"
                                                     >

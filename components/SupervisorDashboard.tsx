@@ -3,7 +3,7 @@ import { User, Kudo, UserProgress } from '../types';
 import { calculateRank } from '../utils/data';
 import { LogOut, Heart, Award, TrendingUp, Users, X, Send, Medal, Star } from 'lucide-react';
 import { supabase } from '../src/lib/supabase';
-import { getCompanyProgress } from '../src/lib/supabase-helpers';
+import { getCompanyProgress, getCompany, getAllKudos, sendKudo } from '../src/lib/supabase-helpers';
 
 interface SupervisorDashboardProps {
   currentUser: User;
@@ -26,12 +26,19 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
   const [showMapaParticipante, setShowMapaParticipante] = useState(false);
   const [participanteSeleccionado, setParticipanteSeleccionado] = useState<string | null>(null);
   const [userProgressMap, setUserProgressMap] = useState<Record<string, any>>({});
+  const [companyName, setCompanyName] = useState<string>('Tu Empresa');
 
   useEffect(() => {
     const loadTeam = async () => {
       if (!currentUser.company) return;
 
-      // 1. Cargar Usuarios (Equipo)
+      // 1. Cargar nombre de empresa desde Supabase
+      const dbCompany = await getCompany(currentUser.company);
+      if (dbCompany) {
+        setCompanyName(dbCompany.nombre || 'Tu Empresa');
+      }
+
+      // 2. Cargar Usuarios (Equipo)
       const { data: profiles } = await supabase
         .from('profiles')
         .select('*')
@@ -39,34 +46,36 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
         .eq('role', 'participante');
 
       if (profiles) {
-        // Map profiles to User interface
         const mappedTeam: User[] = profiles.map((p: any) => ({
           id: p.id,
           username: p.username,
-          fullName: p.full_name || p.username, // Fallback logic
+          fullName: p.full_name || p.username,
           role: p.role,
           company: p.empresa_id,
           xp: p.xp,
           rank: p.nivel,
-          supervisor: '', // No supervisor field in schema yet, but filtering by company
-          onboardingCompleted: true // Asumimos true por ahora o verificamos lógica
+          supervisor: '',
+          onboardingCompleted: true
         }));
         setTeam(mappedTeam);
       }
 
-      // 2. Cargar Kudos (Opcional, mantener localStorage o migrar)
-      // Mantener localStorage para kudos según código previo por ahora, o limpiar si se desea.
-      setKudos(JSON.parse(localStorage.getItem('kudos') || '[]'));
+      // 3. Cargar Kudos desde Supabase
+      const dbKudos = await getAllKudos();
+      const mappedKudos: Kudo[] = (dbKudos || []).map((k: any) => ({
+        id: k.id,
+        from: k.from_user?.username || '',
+        to: k.to_user?.username || '',
+        message: k.message,
+        value: 'Reconocimiento Especial',
+        createdAt: k.created_at,
+        company: currentUser.company || ''
+      }));
+      setKudos(mappedKudos);
     };
 
     loadTeam();
   }, [currentUser.company]);
-
-  const getNombreEmpresa = () => {
-    const companies = JSON.parse(localStorage.getItem('companies') || '[]');
-    const empresa = companies.find((c: any) => c.id === currentUser.company);
-    return empresa ? empresa.name : 'Tu Empresa';
-  };
 
   const calcularEquipoStats = async () => {
     // Usar el estado 'team' que ya fue cargado desde Supabase
@@ -122,27 +131,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
     setMiEquipo(equipoData);
   };
 
-  const enviarKudo = () => {
-    if (!kudosDestinatario || !kudosMensaje.trim()) return;
-    const storedKudos = JSON.parse(localStorage.getItem('kudos') || '[]');
-    const nuevoKudo = {
-      id: `k${Date.now()}`,
-      from: currentUser.username,
-      // @ts-ignore
-      deNombre: currentUser.fullName,
-      to: kudosDestinatario === 'todos' ? 'Todo el Equipo' : kudosDestinatario,
-      message: kudosMensaje,
-      value: 'Reconocimiento Especial',
-      createdAt: new Date().toISOString(),
-      company: currentUser.company
-    };
-    storedKudos.push(nuevoKudo);
-    localStorage.setItem('kudos', JSON.stringify(storedKudos));
-    setKudos(storedKudos);
-    setKudosDestinatario('');
-    setKudosMensaje('');
-    alert('✅ ¡Reconocimiento enviado con éxito!');
-  };
+  // enviarKudo eliminado - era código muerto (nunca se llamaba desde el render)
 
   const calcularAnalyticsEquipo = () => {
     // Usar userProgressMap del estado
@@ -216,27 +205,38 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
   }, [showTeamDashboard, team]); // Dependencia agregada: team
   useEffect(() => { if (miEquipo.length > 0) calcularAnalyticsEquipo(); }, [miEquipo]);
 
-  const handleSendKudo = () => {
-    const newKudo: Kudo = {
-      id: `k${Date.now()}`,
-      from: currentUser.username,
-      to: selectedUser,
-      message: kudoMessage.replace(/[<>]/g, ''),
-      value: kudoValue,
-      createdAt: new Date().toISOString(),
-      company: currentUser.company || ''
-    };
-    const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    const userIndex = allUsers.findIndex((u: User) => u.username === selectedUser);
-    if (userIndex >= 0) {
-      allUsers[userIndex].xp = (allUsers[userIndex].xp || 0) + 10;
-      allUsers[userIndex].rank = calculateRank(allUsers[userIndex].xp).name;
-      localStorage.setItem('users', JSON.stringify(allUsers));
-      setTeam(allUsers.filter((u: User) => u.supervisor === currentUser.username));
+  const handleSendKudo = async () => {
+    if (!currentUser.id || !selectedUser) return;
+    const cleanMessage = kudoMessage.replace(/[<>]/g, '');
+
+    // Encontrar el ID del usuario destino
+    const targetUser = team.find(u => u.username === selectedUser);
+    if (!targetUser?.id) return;
+
+    // Enviar kudo via Supabase (también actualiza XP del receptor)
+    const result = await sendKudo(currentUser.id, targetUser.id, cleanMessage, 10);
+
+    if (result) {
+      // Actualizar XP local del miembro del equipo
+      setTeam(prev => prev.map(u =>
+        u.id === targetUser.id
+          ? { ...u, xp: (u.xp || 0) + 10, rank: calculateRank((u.xp || 0) + 10).name }
+          : u
+      ));
+
+      // Agregar kudo a la lista local
+      const newKudo: Kudo = {
+        id: result.id,
+        from: currentUser.username,
+        to: selectedUser,
+        message: cleanMessage,
+        value: kudoValue,
+        createdAt: result.created_at,
+        company: currentUser.company || ''
+      };
+      setKudos(prev => [newKudo, ...prev]);
     }
-    const updatedKudos = [newKudo, ...kudos];
-    setKudos(updatedKudos);
-    localStorage.setItem('kudos', JSON.stringify(updatedKudos));
+
     setShowKudoModal(false);
     setKudoMessage('');
   };
@@ -260,7 +260,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
           </button>
           <div className="hidden md:block">
             <h1 className="text-2xl font-black text-white tracking-tight">DASHBOARD</h1>
-            <span className="text-xs font-bold text-cyan-100 tracking-wider uppercase">{currentUser.company?.replace('_', ' ')}</span>
+            <span className="text-xs font-bold text-cyan-100 tracking-wider uppercase">{companyName}</span>
           </div>
           {currentUser.role === 'supervisor' && (
             <button onClick={() => setShowTeamDashboard(true)} className="flex items-center gap-2 px-5 py-2.5 bg-white text-blue-600 rounded-xl hover:scale-105 transition shadow-lg font-black group">
@@ -446,7 +446,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
                 <h2 className="text-4xl font-black flex items-center gap-4 tracking-tight">
                   👥 Mi Equipo <span className="bg-white/20 text-base px-4 py-1.5 rounded-full backdrop-blur-md font-bold border border-white/20">{equipoStats.totalParticipantes} miembros</span>
                 </h2>
-                <p className="text-blue-200 mt-2 font-medium text-lg opacity-80">{getNombreEmpresa()}</p>
+                <p className="text-blue-200 mt-2 font-medium text-lg opacity-80">{companyName}</p>
               </div>
               <button onClick={() => setShowTeamDashboard(false)} className="bg-white/10 hover:bg-white/20 text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl backdrop-blur-md transition">✕</button>
             </div>
