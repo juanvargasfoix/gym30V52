@@ -3,6 +3,7 @@ import { User } from '../types';
 import { User as UserIcon, Lock, AlertCircle, ArrowRight } from 'lucide-react';
 import { loginUser } from '../src/lib/supabase-auth';
 import { handleAuthError } from '../src/lib/error-handler';
+import { ILLUSTRATIONS } from '../utils/illustrations';
 
 interface LandingProps {
   onLogin: (user: User) => void;
@@ -104,17 +105,13 @@ export const Landing: React.FC<LandingProps> = ({ onLogin }) => {
               </h2>
 
               <p className="text-lg text-slate-600 max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium">
-                Desarrolla competencias de liderazgo, comunicación y negociación en un entorno gamificado y colaborativo 🚀
+                Desarrolla competencias de liderazgo, comunicación y negociación en un entorno gamificado y colaborativo
               </p>
             </div>
 
-            {/* Bouncing Characters Row */}
-            <div className="flex gap-6 lg:gap-8 pt-4">
-              <div className="text-6xl lg:text-7xl transform hover:scale-110 transition duration-300 animate-bounce cursor-default" style={{ animationDelay: '0s' }}>🧑‍💼</div>
-              <div className="text-6xl lg:text-7xl transform hover:scale-110 transition duration-300 animate-bounce cursor-default" style={{ animationDelay: '0.15s' }}>👩‍💻</div>
-              <div className="text-6xl lg:text-7xl transform hover:scale-110 transition duration-300 animate-bounce cursor-default" style={{ animationDelay: '0.3s' }}>🧑‍🎓</div>
-              <div className="text-6xl lg:text-7xl transform hover:scale-110 transition duration-300 animate-bounce cursor-default" style={{ animationDelay: '0.45s' }}>👨‍🏫</div>
-              <div className="text-6xl lg:text-7xl transform hover:scale-110 transition duration-300 animate-bounce cursor-default" style={{ animationDelay: '0.6s' }}>👩‍⚕️</div>
+            {/* Hero Illustration */}
+            <div className="pt-4 animate-float">
+              <img src={ILLUSTRATIONS.workingTogether} alt="Equipo trabajando juntos" className="w-full max-w-sm lg:max-w-md h-auto mx-auto lg:mx-0 drop-shadow-lg" loading="lazy" />
             </div>
           </div>
 
@@ -126,6 +123,7 @@ export const Landing: React.FC<LandingProps> = ({ onLogin }) => {
               <div className="absolute top-0 left-10 right-10 h-1.5 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-b-xl opacity-80"></div>
 
               <div className="text-center mb-8 mt-4">
+                <img src={ILLUSTRATIONS.conferenceSpeaker} alt="Profesional" className="w-20 h-20 mx-auto mb-4 opacity-80" loading="lazy" />
                 <h3 className="text-3xl font-black text-slate-800 tracking-tight">Bienvenido/a</h3>
                 <p className="text-slate-500 mt-2 font-medium">Ingresa tus credenciales para comenzar</p>
               </div>

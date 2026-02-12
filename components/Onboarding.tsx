@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User } from '../types';
 import { ArrowRight, Check, Sparkles, Map as MapIcon, Award, ChevronRight, Star } from 'lucide-react';
+import { ILLUSTRATIONS, PROFILE_ILLUSTRATIONS, AREA_ILLUSTRATIONS } from '../utils/illustrations';
 
 interface OnboardingProps {
   currentUser: User;
@@ -231,7 +232,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ currentUser, onComplete 
         <div className="max-w-3xl w-full relative z-10">
           <div className="text-center mb-10">
             <span className="inline-block px-4 py-1.5 rounded-full bg-white shadow-sm border border-purple-100 text-purple-600 font-bold text-xs uppercase tracking-widest mb-4">
-              🎯 Descubriendo tu Estilo
+              Descubriendo tu Estilo
             </span>
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 leading-tight">
               Pregunta <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">{currentQIndex + 1}</span> de {questions.length}
@@ -286,10 +287,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ currentUser, onComplete 
         </div>
 
         <div className="relative z-10 max-w-4xl w-full">
-          <div className="inline-block mb-6 animate-bounce">
-            <span className="text-8xl filter drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-              {profileEmojis[finalProfile] || '✨'}
-            </span>
+          <div className="mb-6">
+            <img src={PROFILE_ILLUSTRATIONS[finalProfile] || ILLUSTRATIONS.ourSolution} alt={`Perfil ${finalProfile}`} className="w-36 h-36 md:w-44 md:h-44 mx-auto drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]" loading="lazy" />
           </div>
 
           <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight drop-shadow-xl">
@@ -349,7 +348,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ currentUser, onComplete 
               <Star className="w-4 h-4 text-yellow-300 fill-current animate-spin-slow" />
             </div>
             <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 drop-shadow-md">
-              ¡Bienvenido! 🎉 Elige tus áreas
+              Elige tus areas de entrenamiento
             </h1>
             <p className="text-lg text-purple-100 font-medium max-w-xl">
               Selecciona las competencias que quieres priorizar en tu entrenamiento.
@@ -366,10 +365,10 @@ export const Onboarding: React.FC<OnboardingProps> = ({ currentUser, onComplete 
       <div className="max-w-7xl mx-auto px-6 -mt-20 relative z-20 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
-            { id: 'comunicacion', icon: '💬', name: 'Comunicación', desc: 'Hablar y escuchar', color: 'purple', gradient: 'from-purple-500 to-pink-500' },
-            { id: 'liderazgo', icon: '👑', name: 'Liderazgo', desc: 'Inspirar a otros', color: 'cyan', gradient: 'from-cyan-400 to-blue-500' },
-            { id: 'autoliderazgo', icon: '⚡', name: 'Autoliderazgo', desc: 'Gestión personal', color: 'green', gradient: 'from-green-400 to-teal-500' },
-            { id: 'negociacion', icon: '🤝', name: 'Negociación', desc: 'Acuerdos win-win', color: 'pink', gradient: 'from-pink-500 to-rose-500' }
+            { id: 'comunicacion', name: 'Comunicación', desc: 'Hablar y escuchar', color: 'purple', gradient: 'from-purple-500 to-pink-500' },
+            { id: 'liderazgo', name: 'Liderazgo', desc: 'Inspirar a otros', color: 'cyan', gradient: 'from-cyan-400 to-blue-500' },
+            { id: 'autoliderazgo', name: 'Autoliderazgo', desc: 'Gestión personal', color: 'green', gradient: 'from-green-400 to-teal-500' },
+            { id: 'negociacion', name: 'Negociación', desc: 'Acuerdos win-win', color: 'pink', gradient: 'from-pink-500 to-rose-500' }
           ].map((area) => {
             const isSelected = selectedAreas.includes(area.id);
             return (
@@ -391,8 +390,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ currentUser, onComplete 
                 )}
 
                 <div className="flex flex-col items-center text-center h-full justify-center">
-                  <div className={`text-7xl mb-6 transform transition-transform duration-300 group-hover:scale-125 group-hover:rotate-6 drop-shadow-sm`}>
-                    {area.icon}
+                  <div className="mb-6 transform transition-transform duration-300 group-hover:scale-110">
+                    <img src={AREA_ILLUSTRATIONS[area.id] || ILLUSTRATIONS.ourSolution} alt={area.name} className="w-20 h-20 md:w-24 md:h-24" loading="lazy" />
                   </div>
                   <h3 className={`text-2xl font-black mb-2 transition-colors ${isSelected ? `text-${area.color}-600` : 'text-slate-800'}`}>
                     {area.name}
@@ -414,7 +413,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ currentUser, onComplete 
           {selectedAreas.length === 0 ? (
             <div className="inline-block px-8 py-4 bg-white rounded-2xl shadow-lg border border-slate-100">
               <p className="text-slate-500 font-bold flex items-center gap-2">
-                <span className="text-2xl">😊</span> ¡Selecciona al menos 1 área para continuar!
+Selecciona al menos 1 area para continuar
               </p>
             </div>
           ) : (
@@ -422,7 +421,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ currentUser, onComplete 
               onClick={handleFinish}
               className="px-16 py-6 bg-gradient-to-r from-green-400 to-teal-500 text-white text-xl font-black rounded-[2rem] shadow-xl shadow-green-200 hover:shadow-2xl hover:shadow-green-300 hover:scale-105 active:scale-95 transition-all flex items-center gap-4 mx-auto group"
             >
-              ¡Comenzar mi entrenamiento! <span className="group-hover:rotate-12 transition-transform text-2xl">💪</span>
+              Comenzar mi entrenamiento <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </button>
           )}
         </div>

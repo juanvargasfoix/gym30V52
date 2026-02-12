@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Company, Skill, AreaType, GymConfig, FlexArea, FlexSkill, Role } from '../types';
 import { Users, Building2, Brain, LogOut, Plus, Trash2, Edit2, Settings, Briefcase, Layers, Save, X, CheckSquare, Square, FolderPlus, Library, UserPlus, Lock as LockIcon, Mail, User as UserIconSVG, Briefcase as BriefcaseIcon, Star, PenTool } from 'lucide-react';
 import { registerUser } from '../src/lib/supabase-auth';
+import { ILLUSTRATIONS, AREA_ILLUSTRATIONS } from '../utils/illustrations';
 import {
     getAllProfiles,
     updateProfile,
@@ -482,15 +483,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
         }
     };
 
-    const getAreaEmoji = (area: AreaType) => {
-        switch (area) {
-            case 'comunicacion': return '🗣️';
-            case 'liderazgo': return '🦁';
-            case 'autoliderazgo': return '🧠';
-            case 'negociacion': return '🤝';
-            case 'Productividad': return '⚡';
-            default: return '✨';
-        }
+    const getAreaIllustration = (area: AreaType): string => {
+        return AREA_ILLUSTRATIONS[area] || ILLUSTRATIONS.ourSolution;
     };
 
     return (
@@ -801,7 +795,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                         <div className="space-y-8 animate-fade-in" id="flexFormTop">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <h1 className="text-3xl font-bold text-slate-900">🎯 Biblioteca de Áreas FLEX - Plantillas Reutilizables</h1>
+                                    <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3"><img src={ILLUSTRATIONS.designingComponents} alt="" className="w-10 h-10" loading="lazy" /> Biblioteca de Áreas FLEX</h1>
                                     <p className="text-slate-500 mt-1">Crea áreas que podrás asignar a múltiples empresas</p>
                                 </div>
                                 <button onClick={saveFlexTemplate} className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 shadow-lg shadow-purple-200 transition-all">
@@ -1014,7 +1008,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                     {/* Existing Sections (empresas, usuarios, habilidades) preserved below... */}
                     {section === 'empresas' && (
                         <div className="space-y-6 animate-fade-in">
-                            <h1 className="text-3xl font-bold text-slate-900">Gestión de Empresas</h1>
+                            <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3"><img src={ILLUSTRATIONS.inTheOffice} alt="" className="w-10 h-10" loading="lazy" /> Gestión de Empresas</h1>
 
                             {/* Create Card */}
                             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
@@ -1058,6 +1052,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {companies.length === 0 && (
+                                            <tr><td colSpan={4} className="p-12 text-center text-slate-400">
+                                                <img src={ILLUSTRATIONS.inTheOffice} alt="Sin empresas" className="w-32 h-32 mx-auto opacity-30 mb-3" loading="lazy" />
+                                                <p className="font-medium">No hay empresas registradas aún.</p>
+                                            </td></tr>
+                                        )}
                                         {companies.map(c => (
                                             <tr key={c.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
                                                 <td className="p-4 font-bold text-slate-800">{c.name}</td>
@@ -1086,7 +1086,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                     {section === 'usuarios' && (
                         <div className="space-y-6 animate-fade-in">
                             <div className="flex justify-between items-center">
-                                <h1 className="text-3xl font-bold text-slate-900">Gestión de Usuarios</h1>
+                                <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3"><img src={ILLUSTRATIONS.foundingTeam} alt="" className="w-10 h-10" loading="lazy" /> Gestión de Usuarios</h1>
                                 <button
                                     onClick={() => {
                                         setEditingUserUsername(null); // Ensure create mode
@@ -1112,6 +1112,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {users.length === 0 && (
+                                            <tr><td colSpan={6} className="p-12 text-center text-slate-400">
+                                                <img src={ILLUSTRATIONS.foundingTeam} alt="Sin usuarios" className="w-32 h-32 mx-auto opacity-30 mb-3" loading="lazy" />
+                                                <p className="font-medium">No hay usuarios registrados aún.</p>
+                                            </td></tr>
+                                        )}
                                         {users.map(user => (
                                             <tr key={user.username} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                                                 <td className="p-4 font-mono text-sm text-slate-500 font-bold">{user.username}</td>
@@ -1279,7 +1285,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                     {section === 'habilidades' && (
                         <div className="space-y-6 animate-fade-in">
                             <div className="flex justify-between items-center">
-                                <h1 className="text-3xl font-bold text-slate-900">Gestión de Habilidades</h1>
+                                <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3"><img src={ILLUSTRATIONS.learning} alt="" className="w-10 h-10" loading="lazy" /> Gestión de Habilidades</h1>
                                 <button
                                     onClick={() => {
                                         setEditingSkillId(null);
@@ -1292,14 +1298,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                                 </button>
                             </div>
 
+                            {skills.length === 0 && (
+                                <div className="bg-white rounded-2xl p-12 text-center text-slate-400 border border-slate-200">
+                                    <img src={ILLUSTRATIONS.learning} alt="Sin habilidades" className="w-32 h-32 mx-auto opacity-30 mb-3" loading="lazy" />
+                                    <p className="font-medium">No hay habilidades creadas aún.</p>
+                                </div>
+                            )}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {skills.map(skill => {
                                     const color = getAreaColor(skill.area as AreaType);
-                                    const emoji = getAreaEmoji(skill.area as AreaType);
+                                    const areaIllustration = getAreaIllustration(skill.area as AreaType);
 
                                     return (
                                         <div key={skill.id} className="bg-white p-6 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 hover:shadow-xl transition-all group">
-                                            <div className="text-5xl text-center mb-4 group-hover:scale-110 transition-transform">{emoji}</div>
+                                            <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform"><img src={areaIllustration} alt={skill.area} className="w-16 h-16" loading="lazy" /></div>
                                             <h4 className="font-bold text-lg text-center mb-2 text-slate-800 leading-tight min-h-[3rem] flex items-center justify-center">
                                                 {skill.name}
                                             </h4>

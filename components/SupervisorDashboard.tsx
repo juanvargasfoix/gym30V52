@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { User, Kudo, UserProgress } from '../types';
 import { calculateRank } from '../utils/data';
-import { LogOut, Heart, Award, TrendingUp, Users, X, Send, Medal, Star } from 'lucide-react';
+import { LogOut, Heart, Award, TrendingUp, Users, X, Send, Medal, Star, Map as MapIcon } from 'lucide-react';
 import { supabase } from '../src/lib/supabase';
 import { getCompanyProgress, getCompany, getAllKudos, sendKudo } from '../src/lib/supabase-helpers';
+import { ILLUSTRATIONS } from '../utils/illustrations';
 
 interface SupervisorDashboardProps {
   currentUser: User;
@@ -264,7 +265,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
           </div>
           {currentUser.role === 'supervisor' && (
             <button onClick={() => setShowTeamDashboard(true)} className="flex items-center gap-2 px-5 py-2.5 bg-white text-blue-600 rounded-xl hover:scale-105 transition shadow-lg font-black group">
-              <span className="group-hover:rotate-12 transition-transform">👥</span>
+              <Users className="w-5 h-5" />
               <span>Mi Equipo</span>
             </button>
           )}
@@ -317,7 +318,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
         {/* TEAM GRID */}
         <div>
           <h2 className="text-3xl font-black text-slate-800 mb-8 flex items-center gap-4">
-            <span className="text-4xl">👥</span> Mi Equipo <span className="bg-slate-200 text-slate-600 text-sm font-bold px-3 py-1 rounded-full">{team.length}</span>
+            <img src={ILLUSTRATIONS.foundingTeam} alt="" className="w-10 h-10 inline-block" loading="lazy" /> Mi Equipo <span className="bg-slate-200 text-slate-600 text-sm font-bold px-3 py-1 rounded-full">{team.length}</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {team.map(member => {
@@ -370,7 +371,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
         {/* RECENT ACTIVITY / KUDOS - TIMELINE STYLE */}
         <div>
           <h2 className="text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">
-            <span className="text-3xl">💌</span> Actividad Reciente
+            <img src={ILLUSTRATIONS.blogging} alt="" className="w-8 h-8 inline-block" loading="lazy" /> Actividad Reciente
           </h2>
           <div className="bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden relative">
             {/* Timeline Line */}
@@ -378,15 +379,15 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
 
             {kudos.filter(k => k.from === currentUser.username).length === 0 ? (
               <div className="p-16 text-center text-slate-400 flex flex-col items-center">
-                <Heart className="w-20 h-20 text-slate-100 mb-4" />
+                <img src={ILLUSTRATIONS.recruiterSuggestions} alt="Sin reconocimientos" className="w-40 h-40 opacity-30 mb-4" loading="lazy" />
                 <p className="font-medium text-lg">No has enviado reconocimientos aún.</p>
               </div>
             ) : (
               <div className="relative z-10">
                 {kudos.filter(k => k.from === currentUser.username).map((kudo, idx) => (
                   <div key={kudo.id} className="p-8 flex items-start gap-8 hover:bg-slate-50 transition-colors group border-b border-slate-50 last:border-0">
-                    <div className="w-16 h-16 bg-white border-4 border-pink-100 rounded-full flex items-center justify-center text-3xl shadow-sm z-10 group-hover:scale-110 transition-transform">
-                      🎁
+                    <div className="w-16 h-16 bg-white border-4 border-pink-100 rounded-full flex items-center justify-center shadow-sm z-10 group-hover:scale-110 transition-transform p-2">
+                      <img src={ILLUSTRATIONS.socialFriends} alt="Kudo" className="w-10 h-10" loading="lazy" />
                     </div>
                     <div className="flex-1 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm group-hover:shadow-md transition-all">
                       <div className="flex justify-between items-center mb-3">
@@ -430,7 +431,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
               </div>
               <div className="flex gap-4 pt-2">
                 <button onClick={() => setShowKudoModal(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
-                <button onClick={handleSendKudo} className="flex-1 py-4 bg-pink-500 text-white font-bold rounded-xl hover:bg-pink-600 shadow-lg shadow-pink-200 hover:scale-105 transition-all">Enviar ❤️</button>
+                <button onClick={handleSendKudo} className="flex-1 py-4 bg-pink-500 text-white font-bold rounded-xl hover:bg-pink-600 shadow-lg shadow-pink-200 hover:scale-105 transition-all flex items-center justify-center gap-2"><Send className="w-5 h-5" /> Enviar</button>
               </div>
             </div>
           </div>
@@ -444,7 +445,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
             <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 p-10 rounded-t-[2.5rem] text-white sticky top-0 z-20 shadow-lg flex justify-between items-center">
               <div>
                 <h2 className="text-4xl font-black flex items-center gap-4 tracking-tight">
-                  👥 Mi Equipo <span className="bg-white/20 text-base px-4 py-1.5 rounded-full backdrop-blur-md font-bold border border-white/20">{equipoStats.totalParticipantes} miembros</span>
+                  <Users className="w-10 h-10" /> Mi Equipo <span className="bg-white/20 text-base px-4 py-1.5 rounded-full backdrop-blur-md font-bold border border-white/20">{equipoStats.totalParticipantes} miembros</span>
                 </h2>
                 <p className="text-blue-200 mt-2 font-medium text-lg opacity-80">{companyName}</p>
               </div>
@@ -468,7 +469,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                 <div className="lg:col-span-2 space-y-8">
-                  <h3 className="text-3xl font-black text-slate-800 flex items-center gap-3"><span className="text-4xl">📋</span> Detalle de Participantes</h3>
+                  <h3 className="text-3xl font-black text-slate-800 flex items-center gap-3"><Users className="w-8 h-8 text-slate-600" /> Detalle de Participantes</h3>
                   {miEquipo.length > 0 ? (
                     <div className="space-y-5">
                       {miEquipo.map((participante: any) => (
@@ -487,7 +488,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
                             <p className="text-xs font-black text-slate-400 mb-2 uppercase tracking-wide">{participante.habilidadesCompletadas} / 24 Habs.</p>
                             <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden"><div className="bg-gradient-to-r from-green-400 to-emerald-500 h-4 rounded-full transition-all" style={{ width: `${Math.round((participante.habilidadesCompletadas / 24) * 100)}%` }} /></div>
                           </div>
-                          <button onClick={() => verMapaParticipante(participante.username)} className="p-4 bg-cyan-50 text-cyan-600 rounded-2xl hover:bg-cyan-500 hover:text-white transition-all ml-2 shadow-sm" title="Ver Mapa"><span className="text-2xl">🗺️</span></button>
+                          <button onClick={() => verMapaParticipante(participante.username)} className="p-4 bg-cyan-50 text-cyan-600 rounded-2xl hover:bg-cyan-500 hover:text-white transition-all ml-2 shadow-sm" title="Ver Mapa"><MapIcon className="w-6 h-6" /></button>
                         </div>
                       ))}
                     </div>
@@ -507,7 +508,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
                   </div>
 
                   <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg">
-                    <h3 className="font-black text-xl text-slate-800 mb-6 flex items-center gap-3">🎯 Áreas Fuertes</h3>
+                    <h3 className="font-black text-xl text-slate-800 mb-6 flex items-center gap-3"><TrendingUp className="w-6 h-6 text-blue-500" /> Áreas Fuertes</h3>
                     {analyticsEquipo.areasMasCompletadas.slice(0, 3).map((area, idx) => (
                       <div key={idx} className="mb-4 last:mb-0">
                         <div className="flex justify-between text-xs font-black text-slate-500 mb-2 uppercase tracking-wide"><span>{area.nombre}</span><span className="text-blue-600">{area.porcentaje}%</span></div>
@@ -527,7 +528,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-[2.5rem] max-w-5xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn shadow-2xl border border-white/20">
             <div className="bg-gradient-to-r from-cyan-500 to-blue-600 p-8 rounded-t-[2.5rem] text-white sticky top-0 z-10 flex justify-between items-center shadow-md">
-              <div><h3 className="text-3xl font-black flex items-center gap-3">🗺️ Mapa de Competencias</h3><p className="text-cyan-100 mt-1 font-medium text-lg">{miEquipo.find(p => p.username === participanteSeleccionado)?.fullName}</p></div>
+              <div><h3 className="text-3xl font-black flex items-center gap-3"><MapIcon className="w-8 h-8" /> Mapa de Competencias</h3><p className="text-cyan-100 mt-1 font-medium text-lg">{miEquipo.find(p => p.username === participanteSeleccionado)?.fullName}</p></div>
               <button onClick={() => setShowMapaParticipante(false)} className="bg-white/20 hover:bg-white/30 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl transition backdrop-blur-md">✕</button>
             </div>
             <div className="p-10 bg-slate-50">

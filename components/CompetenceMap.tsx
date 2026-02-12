@@ -5,6 +5,7 @@ import { calculateRank, ranks } from '../utils/data';
 import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, Brain, Sparkles, Send, User as UserIcon, Lightbulb, BarChart2, Award, TrendingUp, AlertCircle, Star, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles, getKudos, getCompanyFlexConfig } from '../src/lib/supabase-helpers';
+import { ILLUSTRATIONS, AREA_ILLUSTRATIONS } from '../utils/illustrations';
 
 
 interface CompetenceMapProps {
@@ -1079,10 +1080,10 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   };
 
   const areas = [
-    { id: 'comunicacion', name: 'Comunicación Efectiva', color: 'purple', gradient: 'from-purple-400 to-pink-500', emoji: '💬', border: 'border-purple-400', shadow: 'shadow-purple-200/50' },
-    { id: 'liderazgo', name: 'Liderazgo Consciente', color: 'cyan', gradient: 'from-cyan-400 to-blue-500', emoji: '👑', border: 'border-cyan-400', shadow: 'shadow-cyan-200/50' },
-    { id: 'autoliderazgo', name: 'Autoliderazgo', color: 'green', gradient: 'from-green-400 to-teal-500', emoji: '⚡', border: 'border-green-400', shadow: 'shadow-green-200/50' },
-    { id: 'negociacion', name: 'Negociación', color: 'pink', gradient: 'from-pink-400 to-rose-500', emoji: '🤝', border: 'border-pink-400', shadow: 'shadow-pink-200/50' }
+    { id: 'comunicacion', name: 'Comunicación Efectiva', color: 'purple', gradient: 'from-purple-400 to-pink-500', border: 'border-purple-400', shadow: 'shadow-purple-200/50' },
+    { id: 'liderazgo', name: 'Liderazgo Consciente', color: 'cyan', gradient: 'from-cyan-400 to-blue-500', border: 'border-cyan-400', shadow: 'shadow-cyan-200/50' },
+    { id: 'autoliderazgo', name: 'Autoliderazgo', color: 'green', gradient: 'from-green-400 to-teal-500', border: 'border-green-400', shadow: 'shadow-green-200/50' },
+    { id: 'negociacion', name: 'Negociación', color: 'pink', gradient: 'from-pink-400 to-rose-500', border: 'border-pink-400', shadow: 'shadow-pink-200/50' }
   ];
 
   // Helper to render ranking row
@@ -1166,7 +1167,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
             onClick={() => setShowProgressDashboard(true)}
             className="flex items-center gap-2 px-5 py-2.5 bg-white text-purple-600 rounded-xl hover:scale-105 transition shadow-lg font-bold group"
           >
-            <span className="group-hover:rotate-12 transition-transform duration-300">📊</span>
+            <BarChart2 className="w-5 h-5" />
             <span>Mi Progreso</span>
           </button>
 
@@ -1185,13 +1186,9 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white rounded-[2.5rem] max-w-2xl w-full overflow-hidden shadow-2xl animate-scaleIn border border-white/50">
             <div className="relative bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 p-10 text-white text-center overflow-hidden">
-              <div className="absolute inset-0 opacity-20 pointer-events-none">
-                <div className="absolute top-10 left-10 text-6xl animate-float">🎉</div>
-                <div className="absolute bottom-10 right-10 text-6xl animate-float" style={{ animationDelay: '1s' }}>✨</div>
-              </div>
               <div className="relative z-10">
-                <div className="text-8xl mb-4 animate-bounce drop-shadow-lg">💌</div>
-                <h2 className="text-4xl font-black mb-2 tracking-tight">¡Reconocimientos!</h2>
+                <img src={ILLUSTRATIONS.recruiterSuggestions} alt="Reconocimientos" className="w-28 h-28 mx-auto mb-4 drop-shadow-lg" loading="lazy" />
+                <h2 className="text-4xl font-black mb-2 tracking-tight">Reconocimientos</h2>
                 <p className="text-pink-100 text-lg font-medium">
                   {kudosRecibidos.length} mensaje{kudosRecibidos.length !== 1 ? 's' : ''} inspiradores de tu equipo
                 </p>
@@ -1210,7 +1207,9 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                   <div key={kudo.id} className="bg-white p-6 rounded-3xl shadow-sm hover:shadow-lg border border-pink-100 transition-all hover:-translate-y-1 relative group overflow-hidden">
                     <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-pink-100 to-transparent rounded-bl-full opacity-50 group-hover:opacity-100 transition-opacity"></div>
                     <div className="flex gap-4">
-                      <div className="text-4xl bg-pink-50 p-3 rounded-2xl h-fit shadow-inner">🎉</div>
+                      <div className="bg-pink-50 p-3 rounded-2xl h-fit shadow-inner">
+                        <img src={ILLUSTRATIONS.socialFriends} alt="Kudo" className="w-10 h-10" loading="lazy" />
+                      </div>
                       <div>
                         <div className="flex justify-between items-center mb-1">
                           <h4 className="font-bold text-slate-800 text-lg">{kudo.from === currentUser.username ? 'Yo' : (kudo as any).deNombre || kudo.from}</h4>
@@ -1226,8 +1225,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                 ))
               ) : (
                 <div className="text-center py-12 text-slate-400">
-                  <Heart className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                  <p>Aún no tienes mensajes. ¡Sigue brillando!</p>
+                  <img src={ILLUSTRATIONS.coffeeWithFriends} alt="Sin kudos aún" className="w-40 h-40 mx-auto mb-4 opacity-30" loading="lazy" />
+                  <p>Aún no tienes mensajes. Sigue adelante.</p>
                 </div>
               )}
             </div>
@@ -1237,7 +1236,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                 onClick={() => { marcarKudosComoLeidos(); setShowKudosModal(false); }}
                 className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-2xl shadow-lg shadow-pink-200 hover:scale-105 transition-transform"
               >
-                ¡Gracias Equipo! 🚀
+                Gracias, Equipo
               </button>
             </div>
           </div>
@@ -1250,7 +1249,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
           <div className="bg-slate-50 rounded-[3rem] max-w-6xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn shadow-2xl relative border-4 border-white">
             <div className="sticky top-0 z-20 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 p-8 rounded-t-[2.5rem] flex justify-between items-center shadow-lg text-white">
               <div>
-                <h2 className="text-4xl font-black flex items-center gap-3 tracking-tight">📊 Mi Tablero <span className="bg-white/20 text-sm px-3 py-1 rounded-full backdrop-blur-md border border-white/20">v5.1</span></h2>
+                <h2 className="text-4xl font-black flex items-center gap-3 tracking-tight"><img src={ILLUSTRATIONS.scrumBoard} alt="" className="w-10 h-10" loading="lazy" /> Mi Tablero <span className="bg-white/20 text-sm px-3 py-1 rounded-full backdrop-blur-md border border-white/20">v5.2</span></h2>
                 <p className="text-cyan-100 font-medium mt-1 opacity-90">{currentUser.fullName}</p>
               </div>
               <button onClick={() => setShowProgressDashboard(false)} className="bg-white/20 hover:bg-white/30 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl transition backdrop-blur-md">✕</button>
@@ -1263,37 +1262,37 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                 <div className="bg-white p-6 rounded-2xl border-2 border-green-400 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 group">
                   <div className="flex justify-between items-start mb-4">
                     <div className="text-green-500 font-black text-xs uppercase tracking-wider">Logros</div>
-                    <div className="text-4xl group-hover:scale-110 transition-transform">✅</div>
+                    <CheckCircle className="w-8 h-8 text-green-500 group-hover:scale-110 transition-transform" />
                   </div>
                   <div className="text-5xl font-black text-slate-800 mb-1">{dashboardStats.habilidadesCompletadas}<span className="text-slate-300 text-3xl">/24</span></div>
                   <div className="text-slate-400 font-medium text-sm">Habilidades Listas</div>
                 </div>
 
-                {/* Card: Experience (Used as "En Progreso" context) - Orange Border */}
+                {/* Card: Experience - Orange Border */}
                 <div className="bg-white p-6 rounded-2xl border-2 border-orange-400 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 group">
                   <div className="flex justify-between items-start mb-4">
                     <div className="text-orange-500 font-black text-xs uppercase tracking-wider">Experiencia</div>
-                    <div className="text-4xl group-hover:scale-110 transition-transform">🎯</div>
+                    <TrendingUp className="w-8 h-8 text-orange-500 group-hover:scale-110 transition-transform" />
                   </div>
                   <div className="text-5xl font-black text-slate-800 mb-1">{currentXP}</div>
                   <div className="text-slate-400 font-medium text-sm">XP Total Acumulado</div>
                 </div>
 
-                {/* Card: Kudos (Replaces Profile for visual balance with prompt) - Pink Border */}
+                {/* Card: Kudos - Pink Border */}
                 <div className="bg-white p-6 rounded-2xl border-2 border-pink-400 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 group">
                   <div className="flex justify-between items-start mb-4">
                     <div className="text-pink-500 font-black text-xs uppercase tracking-wider">Reconocimiento</div>
-                    <div className="text-4xl group-hover:scale-110 transition-transform">💝</div>
+                    <Heart className="w-8 h-8 text-pink-500 group-hover:scale-110 transition-transform" />
                   </div>
                   <div className="text-5xl font-black text-slate-800 mb-1">{kudosRecibidos.length}</div>
                   <div className="text-slate-400 font-medium text-sm">Kudos Recibidos</div>
                 </div>
 
-                {/* Card: Rank - Cyan/Blue default */}
+                {/* Card: Rank - Blue */}
                 <div className="bg-white p-6 rounded-2xl border-2 border-blue-400 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 group">
                   <div className="flex justify-between items-start mb-4">
                     <div className="text-blue-500 font-black text-xs uppercase tracking-wider">Rango</div>
-                    <div className="text-4xl group-hover:scale-110 transition-transform">🏅</div>
+                    <Medal className="w-8 h-8 text-blue-500 group-hover:scale-110 transition-transform" />
                   </div>
                   <div className="text-3xl font-black text-slate-800 capitalize leading-tight mb-2">{calculateRank(currentXP).name}</div>
                   <div className="text-slate-400 font-medium text-sm">Nivel de Seniority</div>
@@ -1388,7 +1387,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-[2.5rem] max-w-2xl w-full max-h-[85vh] flex flex-col relative overflow-hidden animate-scaleIn shadow-2xl border border-white/20">
             <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-8 text-white text-center shadow-md shrink-0">
-              <h2 className="text-3xl font-black tracking-tight mb-2">🏆 Ranking Completo</h2>
+              <h2 className="text-3xl font-black tracking-tight mb-2 flex items-center justify-center gap-3"><img src={ILLUSTRATIONS.sportsScores} alt="" className="w-10 h-10" loading="lazy" /> Ranking Completo</h2>
               <p className="opacity-90 font-medium">Comparativa de XP en {dashboardStats.nombreEmpresa}</p>
               <button onClick={() => setShowFullRanking(false)} className="absolute top-6 right-6 bg-black/20 hover:bg-black/30 rounded-full w-10 h-10 flex items-center justify-center transition">✕</button>
             </div>
@@ -1431,8 +1430,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                 <div className="absolute bottom-0 left-0 w-40 h-40 bg-black opacity-5 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"></div>
 
                 <div className="flex items-center gap-6 relative z-10">
-                  <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-6xl shadow-inner border border-white/20">
-                    {area.emoji}
+                  <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-inner border border-white/20 p-2">
+                    <img src={AREA_ILLUSTRATIONS[area.id] || ILLUSTRATIONS.ourSolution} alt={area.name} className="w-16 h-16" loading="lazy" />
                   </div>
                   <div>
                     <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-2 drop-shadow-sm">{area.name}</h2>
@@ -1500,7 +1499,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                                         w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black mb-6 shadow-inner
                                         ${isLocked ? 'bg-slate-200 text-slate-400' : isCompleted ? 'bg-green-100 text-green-600' : `bg-${area.color}-50 text-${area.color}-600`}
                                      `}>
-                            {isCompleted ? '🎉' : skill.order}
+                            {isCompleted ? <Check className="w-6 h-6" /> : skill.order}
                           </div>
 
                           <h3 className={`text-2xl font-black mb-3 leading-tight ${isLocked ? 'text-slate-400' : 'text-slate-800'}`}>
@@ -1550,8 +1549,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
 
             <div className="flex-1 overflow-y-auto">
               <div className="bg-gradient-to-b from-slate-50 to-white p-10 text-center">
-                <div className="w-20 h-20 mx-auto bg-white rounded-3xl shadow-lg flex items-center justify-center mb-6 text-4xl border border-slate-100">
-                  {areas.find(a => a.id === selectedSkill.area)?.emoji || '✨'}
+                <div className="w-20 h-20 mx-auto bg-white rounded-3xl shadow-lg flex items-center justify-center mb-6 border border-slate-100 p-3">
+                  <img src={AREA_ILLUSTRATIONS[selectedSkill.area] || ILLUSTRATIONS.ourSolution} alt="" className="w-14 h-14" loading="lazy" />
                 </div>
                 <h2 className="text-4xl font-black text-slate-900 mb-3 tracking-tight">{selectedSkill.name}</h2>
                 <p className="text-xl text-slate-500 max-w-2xl mx-auto font-light">{selectedSkill.description}</p>
@@ -1736,8 +1735,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                           return (
                             <div className="h-full flex flex-col items-center justify-center p-8 text-center animate-fade-in">
                               {/* Celebration Icon */}
-                              <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 animate-bounce text-5xl">
-                                🎊
+                              <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 p-4">
+                                <img src={ILLUSTRATIONS.ourSolution} alt="Completado" className="w-16 h-16" loading="lazy" />
                               </div>
                               <h3 className="text-4xl font-black text-slate-900 mb-2">¡Simulación Completada!</h3>
                               <div className="flex gap-4 mb-8">
