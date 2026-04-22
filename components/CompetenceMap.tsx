@@ -2,25 +2,20 @@
 import React, { useState, useEffect } from 'react';
 import { User, Skill, Company, UserProgress, Kudo, FlexArea } from '../types';
 import { calculateRank, ranks } from '../utils/data';
-import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, Sparkles, User as UserIcon, Lightbulb, BarChart2, Award, TrendingUp, AlertCircle, Star, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
-import { evaluateTextResponse, generateReflectionInsight } from '../src/lib/gemini';
+import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, User as UserIcon, BarChart2, Award, TrendingUp, AlertCircle, Star, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
 import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles, getKudos, getCompanyFlexConfig } from '../src/lib/supabase-helpers';
 import { ILLUSTRATIONS, AREA_ILLUSTRATIONS } from '../utils/illustrations';
 import { SKILL_CONTENT, SkillContent, SkillContentA, SkillContentB, SkillContentC, SkillContentD } from './data/skill-content';
 import { QuizPanel } from './exercises/QuizPanel';
 import { TextEvalPanel } from './exercises/TextEvalPanel';
 import { RoleplayChat } from './exercises/RoleplayChat';
+import { ReflectionPanel } from './exercises/ReflectionPanel';
 
 
 interface CompetenceMapProps {
   currentUser: User;
   onLogout: () => void;
 }
-
-// --- UTILS ---
-const countWords = (text: string) => {
-  return text.trim().split(/\s+/).filter(word => word.length > 0).length;
-};
 
 export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLogout }) => {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -56,11 +51,6 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   });
 
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
-
-  // Exercise States
-  const [reflectionAnswers, setReflectionAnswers] = useState<string[]>([]);
-  const [insightResult, setInsightResult] = useState<string | null>(null);
-  const [isGeneratingInsight, setIsGeneratingInsight] = useState(false);
 
   const isAlreadyCompleted = selectedSkill && (userProgress[selectedSkill.id]?.status === 'conquered' || userProgress[selectedSkill.id]?.status === 'completed');
 
@@ -181,13 +171,6 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
 
     loadAppData();
   }, [currentUser]);
-
-  useEffect(() => {
-    if (selectedSkill) {
-      setReflectionAnswers(new Array(3).fill(''));
-      setInsightResult(null);
-    }
-  }, [selectedSkill]);
 
   useEffect(() => {
     if (showProgressDashboard) {
@@ -336,16 +319,6 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     } else {
       console.error('❌ Error guardando progreso en Supabase');
     }
-  };
-
-  const handleReflectionSubmit = async (content: SkillContentD) => {
-    setIsGeneratingInsight(true);
-    try {
-      const prompt = content.promptGenerator(reflectionAnswers);
-      const insight = await generateReflectionInsight(prompt);
-      setInsightResult(insight);
-      completeSkill(50, 100);
-    } catch (e) { console.error(e); } finally { setIsGeneratingInsight(false); }
   };
 
   const areas = [
@@ -888,37 +861,15 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                       )}
 
                       {/* TIPO D: REFLEXIÓN */}
-                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'D' && (() => {
-                        const content = SKILL_CONTENT[selectedSkill.contentKey] as SkillContentD;
-                        const isValid = reflectionAnswers.every(ans => countWords(ans) >= 100);
-                        return (
-                          <div className="space-y-8">
-                            {isAlreadyCompleted && (
-                              <div className="bg-green-50 text-green-700 p-4 rounded-xl font-bold border border-green-200 text-center">
-                                ✅ Ya completaste esta reflexión
-                              </div>
-                            )}
-                            {content.questions.map((q, i) => (
-                              <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                                <label className="block font-bold text-slate-800 mb-4 text-lg">{q}</label>
-                                <textarea className="w-full p-4 bg-slate-50 border-0 rounded-xl focus:ring-2 ring-pink-500 outline-none text-base leading-relaxed" rows={4} value={reflectionAnswers[i] || ''} onChange={(e) => { const newAns = [...reflectionAnswers]; newAns[i] = e.target.value; setReflectionAnswers(newAns); }} placeholder="Escribe tu reflexión..." disabled={isAlreadyCompleted} />
-                                <div className={`text-xs text-right mt-2 font-bold ${countWords(reflectionAnswers[i] || '') < 100 ? 'text-orange-500' : 'text-green-600'}`}>{countWords(reflectionAnswers[i] || '')} / 100 palabras</div>
-                              </div>
-                            ))}
-                            {!insightResult ? (
-                              <button onClick={() => handleReflectionSubmit(content)} disabled={!isValid || isGeneratingInsight || isAlreadyCompleted} className="w-full py-5 bg-pink-500 disabled:bg-slate-300 text-white font-bold rounded-2xl shadow-xl hover:bg-pink-600 transition-all flex justify-center items-center gap-3 text-lg">
-                                {isGeneratingInsight ? <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin" /> : <><Lightbulb className="w-6 h-6" /> {isAlreadyCompleted ? "Reflexión Completada" : "Enviar Reflexión"}</>}
-                              </button>
-                            ) : (
-                              <div className="bg-pink-50 p-8 rounded-[2rem] border border-pink-100 animate-fade-in shadow-lg">
-                                <div className="flex items-center gap-3 mb-4"><Sparkles className="w-6 h-6 text-pink-500" /><span className="font-black text-xl text-pink-700">Insight del Coach</span></div>
-                                <p className="text-slate-800 text-lg leading-relaxed italic mb-6">"{insightResult}"</p>
-                                <button onClick={() => setSelectedSkill(null)} className="w-full py-4 bg-green-500 text-white font-bold rounded-2xl hover:scale-105 transition-transform shadow-lg">¡Entendido! (+50 XP)</button>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })()}
+                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'D' && (
+                        <ReflectionPanel
+                          key={selectedSkill.contentKey}
+                          content={SKILL_CONTENT[selectedSkill.contentKey] as SkillContentD}
+                          isAlreadyCompleted={!!isAlreadyCompleted}
+                          onComplete={() => completeSkill(50, 100)}
+                          onBack={() => setSelectedSkill(null)}
+                        />
+                      )}
                     </div>
                   </div>
                 ) : (
