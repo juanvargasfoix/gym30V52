@@ -5,7 +5,7 @@ const MODEL = "gemini-2.5-flash";
 
 let _client: GoogleGenAI | null = null;
 function getClient(): GoogleGenAI | null {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (process.env as any).GEMINI_API_KEY;
   if (!apiKey) return null;
   if (!_client) _client = new GoogleGenAI({ apiKey });
   return _client;
