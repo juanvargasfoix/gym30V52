@@ -2,14 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { User, Skill, Company, UserProgress, Kudo, FlexArea } from '../types';
 import { calculateRank, ranks } from '../utils/data';
-import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, User as UserIcon, BarChart2, Award, TrendingUp, AlertCircle, Star, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
+import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, BarChart2, Award, TrendingUp, AlertCircle, Star, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
 import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles, getKudos, getCompanyFlexConfig } from '../src/lib/supabase-helpers';
 import { ILLUSTRATIONS, AREA_ILLUSTRATIONS } from '../utils/illustrations';
-import { SKILL_CONTENT, SkillContent, SkillContentA, SkillContentB, SkillContentC, SkillContentD } from './data/skill-content';
-import { QuizPanel } from './exercises/QuizPanel';
-import { TextEvalPanel } from './exercises/TextEvalPanel';
-import { RoleplayChat } from './exercises/RoleplayChat';
-import { ReflectionPanel } from './exercises/ReflectionPanel';
+import { ExerciseRunner } from './exercises/ExerciseRunner';
 
 
 interface CompetenceMapProps {
@@ -799,82 +795,13 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
               </div>
 
               <div className="p-10">
-                {SKILL_CONTENT[selectedSkill.contentKey] ? (
-                  <div className="space-y-10">
-                    {/* THEORY CARD */}
-                    <div className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-lg">
-                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'A' && (SKILL_CONTENT[selectedSkill.contentKey] as SkillContentA).theory}
-                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'B' && (SKILL_CONTENT[selectedSkill.contentKey] as SkillContentB).theory}
-                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'C' && (
-                        <div>
-                          <div className={`bg-gradient-to-r ${(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC).scenario.headerGradient} p-8 rounded-2xl text-white mb-6 shadow-lg`}>
-                            <h3 className="text-3xl font-black mb-2">Roleplay: {(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC).scenario.title}</h3>
-                            <p className="opacity-90 text-lg">{(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC).scenario.description}</p>
-                          </div>
-                          <div className="flex gap-6 text-sm font-bold text-slate-600 bg-slate-50 p-4 rounded-xl">
-                            <div className="flex items-center gap-2"><UserIcon className="w-5 h-5 text-indigo-500" /> Tu rol: <span className="text-slate-900">{(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC).scenario.userRole}</span></div>
-                            <div className="flex items-center gap-2"><Award className="w-5 h-5 text-indigo-500" /> Objetivo: <span className="text-slate-900">{(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC).scenario.goal}</span></div>
-                          </div>
-                        </div>
-                      )}
-                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'D' && (
-                        <div>
-                          <h3 className="text-3xl font-black text-slate-900 mb-4">{(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentD).title}</h3>
-                          <p className="text-lg text-slate-600 leading-relaxed">{(SKILL_CONTENT[selectedSkill.contentKey] as SkillContentD).description}</p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* PRACTICE CARD */}
-                    <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-200 shadow-inner">
-                      {/* TIPO A: LINEAR QUIZ */}
-                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'A' && (
-                        <QuizPanel
-                          key={selectedSkill.contentKey}
-                          content={SKILL_CONTENT[selectedSkill.contentKey] as SkillContentA}
-                          isAlreadyCompleted={!!isAlreadyCompleted}
-                          onComplete={(pct) => completeSkill(50, pct)}
-                          onBack={() => setSelectedSkill(null)}
-                        />
-                      )}
-
-                      {/* TIPO B: TEXTO ABIERTO + ESTRELLAS */}
-                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'B' && (
-                        <TextEvalPanel
-                          key={selectedSkill.contentKey}
-                          content={SKILL_CONTENT[selectedSkill.contentKey] as SkillContentB}
-                          isAlreadyCompleted={!!isAlreadyCompleted}
-                          onComplete={(pct) => completeSkill(50, pct)}
-                          onBack={() => setSelectedSkill(null)}
-                        />
-                      )}
-
-                      {/* TIPO C: CHAT */}
-                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'C' && (
-                        <RoleplayChat
-                          key={selectedSkill.contentKey}
-                          content={SKILL_CONTENT[selectedSkill.contentKey] as SkillContentC}
-                          isAlreadyCompleted={!!isAlreadyCompleted}
-                          onComplete={() => completeSkill(50, 100)}
-                          onBack={() => setSelectedSkill(null)}
-                        />
-                      )}
-
-                      {/* TIPO D: REFLEXIÓN */}
-                      {SKILL_CONTENT[selectedSkill.contentKey].type === 'D' && (
-                        <ReflectionPanel
-                          key={selectedSkill.contentKey}
-                          content={SKILL_CONTENT[selectedSkill.contentKey] as SkillContentD}
-                          isAlreadyCompleted={!!isAlreadyCompleted}
-                          onComplete={() => completeSkill(50, 100)}
-                          onBack={() => setSelectedSkill(null)}
-                        />
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-20 text-slate-400">Contenido no disponible.</div>
-                )}
+                <ExerciseRunner
+                  key={selectedSkill.contentKey}
+                  contentKey={selectedSkill.contentKey}
+                  isAlreadyCompleted={!!isAlreadyCompleted}
+                  onComplete={(pct) => completeSkill(50, pct)}
+                  onBack={() => setSelectedSkill(null)}
+                />
               </div>
             </div>
           </div>
