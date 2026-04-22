@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/*
+  Dynamic color classes used in CompetenceMap via template literals:
+    bg-${area.color}-{50,100,100/30}, text-${area.color}-600,
+    from-${area.color}-400, to-${area.color}-500
+  where area.color is: purple | cyan | green | pink
+*/
+@source inline("bg-purple-50 bg-purple-100 bg-purple-100/30 bg-cyan-50 bg-cyan-100 bg-cyan-100/30 bg-green-50 bg-green-100 bg-green-100/30 bg-pink-50 bg-pink-100 bg-pink-100/30 text-purple-600 text-cyan-600 text-green-600 text-pink-600 from-purple-400 from-cyan-400 from-green-400 from-pink-400 to-purple-500 to-cyan-500 to-green-500 to-pink-500");
+
+/* Custom styles migrated from index.html <style> block */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.blob-shape {
+  animation: blob-bounce 10s infinite ease-in-out;
+}
+
+@keyframes blob-bounce {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+}
