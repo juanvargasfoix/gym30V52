@@ -16,8 +16,6 @@ export function calculateRank(xp: number = 0) {
 export function initializeDefaultData() {
   // Datos ahora vienen de Supabase.
   // Esta función se mantiene vacía por compatibilidad pero ya no inicializa localStorage.
-  // Companies, users, skills, kudos, userProgress → todos en Supabase.
-  console.log('✅ initializeDefaultData: datos gestionados por Supabase');
 }
 
 export function formatDate(isoString: string) {

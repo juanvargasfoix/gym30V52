@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { User } from '../types';
 import { ArrowRight, Check, Sparkles, Map as MapIcon, Award, ChevronRight, Star } from 'lucide-react';
 import { ILLUSTRATIONS, PROFILE_ILLUSTRATIONS, AREA_ILLUSTRATIONS } from '../utils/illustrations';
@@ -147,10 +147,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ currentUser, onComplete 
   const [finalProfile, setFinalProfile] = useState<string>('');
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
 
-  useEffect(() => {
-    console.log('🎯 Quiz inicializado con', questions.length, 'preguntas');
-  }, []);
-
   const handleAnswer = (profile: string) => {
     const nextAnswers = { ...quizAnswers, [Object.keys(quizAnswers).length + 1]: profile };
     setQuizAnswers(nextAnswers);
@@ -191,8 +187,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ currentUser, onComplete 
         });
 
         if (result) {
-          console.log('✅ Onboarding completado y guardado en Supabase');
-
           // Mapear el resultado de Supabase al tipo User de la app
           const updatedUser: User = {
             id: result.id,

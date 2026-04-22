@@ -90,8 +90,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
     useEffect(() => {
         const loadData = async () => {
             try {
-                console.log('🔧 INICIALIZANDO PANEL DE CONTROL ADMIN SUPABASE');
-
                 // 1. Fetch Companies
                 const dbCompanies = await getCompanies();
                 const mappedCompanies: Company[] = dbCompanies.map((c: any) => ({
@@ -140,8 +138,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                     .map((c: any) => c.flex_area_config);
                 setFlexLibrary(flexFromCompanies);
 
-                console.log('✅ PANEL ADMIN CARGADO DESDE SUPABASE');
-
             } catch (error) {
                 console.error('❌ Error cargando datos en Admin:', error);
             }
@@ -153,20 +149,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
     // --- SAVE HANDLERS ---
 
     const saveGymConfig = async () => {
-        console.log('💾 GUARDANDO CONFIGURACIÓN GYM 3.0 EN SUPABASE');
-        console.log('📊 Datos guardados:', gymConfig);
-
         await updateGymConfig(gymConfig);
-
-        console.log('✅ Configuración guardada en Supabase');
-
         setIsSavingConfig(true);
         setTimeout(() => setIsSavingConfig(false), 2000);
     };
 
     const saveFlexTemplate = () => {
-        console.log('📚 Guardando plantilla FLEX en estado local');
-
         if (!currentTemplate.name) {
             alert('El nombre del área es obligatorio');
             return;
@@ -186,9 +174,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
 
         setFlexLibrary(updatedLibrary);
         // Nota: las flex areas se guardan en Supabase cuando se asignan a una empresa (updateCompanyFlexConfig)
-
-        console.log('✅ Área FLEX creada como plantilla:', currentTemplate.name);
-        console.log('📋 Total plantillas FLEX:', updatedLibrary.length);
 
         setCurrentTemplate({
             id: '',
@@ -217,8 +202,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
     const handleCompanyAreaSave = async () => {
         if (!editingCompanyId) return;
 
-        console.log('📋 PASO 2/3: Integrando dropdown FLEX');
-
         const result = await updateCompany(editingCompanyId, {
             areas_activas: tempActiveAreas,
             area_flex: tempActiveAreas.includes('custom') ? tempFlexAreaId : null
@@ -236,7 +219,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
             });
             setCompanies(updatedCompanies);
             setEditingCompanyId(null);
-            console.log('✅ Empresa actualizada en Supabase');
         } else {
             alert("Error al actualizar la empresa en Supabase");
         }
@@ -279,7 +261,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
             };
             setCompanies([...companies, mapped]);
             setNewCompany({ name: '', activeAreas: [] });
-            console.log('✅ Empresa creada en Supabase');
         } else {
             alert("Error al crear la empresa en Supabase");
         }
@@ -326,7 +307,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                 role: 'participante',
                 company: ''
             });
-            console.log('✅ Usuario registrado en Supabase');
         } else {
             setUserFormError(result.error?.message || 'Error al registrar usuario');
         }
@@ -388,7 +368,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                 role: 'participante',
                 company: ''
             });
-            console.log('✅ Perfil actualizado en Supabase');
         } else {
             setUserFormError('Error al actualizar perfil en Supabase');
         }

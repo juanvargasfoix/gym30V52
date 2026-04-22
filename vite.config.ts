@@ -21,17 +21,11 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       minify: 'esbuild',
-      terserOptions: {
-        compress: {
-          drop_console: true,
-          drop_debugger: true
-        }
-      },
       rollupOptions: {
         output: {
           manualChunks: {
             'vendor': ['react', 'react-dom'],
-            'gemini': ['@google/generative-ai']
+            'gemini': ['@google/genai']
           }
         }
       }

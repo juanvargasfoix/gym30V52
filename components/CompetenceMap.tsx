@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Skill, Company, UserProgress, Kudo, FlexArea } from '../types';
 import { calculateRank, ranks } from '../utils/data';
 import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, Brain, Sparkles, Send, User as UserIcon, Lightbulb, BarChart2, Award, TrendingUp, AlertCircle, Star, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import { evaluateTextResponse, generateRoleplayReply, generateReflectionInsight } from '../src/lib/gemini';
 import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles, getKudos, getCompanyFlexConfig } from '../src/lib/supabase-helpers';
 import { ILLUSTRATIONS, AREA_ILLUSTRATIONS } from '../utils/illustrations';
 
@@ -16,11 +16,6 @@ interface CompetenceMapProps {
 // --- UTILS ---
 const countWords = (text: string) => {
   return text.trim().split(/\s+/).filter(word => word.length > 0).length;
-};
-
-const cleanJSON = (text: string) => {
-  const match = text.match(/\{[\s\S]*\}/);
-  return match ? match[0] : '{}';
 };
 
 // --- TYPES ---
@@ -854,9 +849,6 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
 
       // 3. Current User Stats
       const miProgreso = userProgress; // already loaded in useEffect
-      console.log('DEBUG miProgreso:', miProgreso);
-      console.log('DEBUG keys:', Object.keys(miProgreso));
-
       const completadas = Object.values(miProgreso).filter((h: any) => h.status === 'conquered' || h.status === 'completed').length;
 
       const countCompletedInArea = (prefix: string) =>
@@ -982,8 +974,6 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
 
       // 4. Update Local XP State
       setCurrentXP(newXP);
-
-      console.log('✅ Habilidad completada y guardada en Supabase');
     } else {
       console.error('❌ Error guardando progreso en Supabase');
     }
@@ -1014,18 +1004,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     if (countWords(textResponse) < 150) return;
     setIsEvaluating(true);
     try {
-      const ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
       const prompt = content.evaluatorConfig.promptGenerator(textResponse);
-      let result;
-      try {
-        const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const response = await model.generateContent(prompt);
-        const text = response.response.text();
-        result = JSON.parse(cleanJSON(text || '{}'));
-      } catch (e) {
-        console.log("Mocking AI response", e);
-        result = { scores: [85, 90, 80, 85], feedback: "Excelente respuesta demostrando empatía y claridad.", aprobado: true };
-      }
+      const result = await evaluateTextResponse(prompt);
       setEvaluationResult(result);
       if (result.aprobado || result.scores[0] > 60) {
         const avgScore = Math.round(result.scores.reduce((a: number, b: number) => a + b, 0) / result.scores.length);
@@ -1049,32 +1029,18 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
       return;
     }
     try {
-      const ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-      let responseText = "...";
-      try {
-        const prompt = content.promptGenerator(newHistory, chatInput, content.scenario);
-        const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const response = await model.generateContent(prompt);
-        const text = response.response.text();
-        const jsonRes = JSON.parse(cleanJSON(text || '{}'));
-        responseText = jsonRes.respuesta || "Interesante punto.";
-      } catch (e) { responseText = "Entiendo tu punto. ¿Podrías elaborar más?"; }
-      setChatHistory([...newHistory, { rol: content.scenario.roleName, texto: responseText }]);
+      const prompt = content.promptGenerator(newHistory, chatInput, content.scenario);
+      const reply = await generateRoleplayReply(prompt);
+      setChatHistory([...newHistory, { rol: content.scenario.roleName, texto: reply.respuesta }]);
     } catch (e) { console.error(e); } finally { setIsTyping(false); }
   };
 
   const handleReflectionSubmit = async (content: SkillContentD) => {
     setIsGeneratingInsight(true);
     try {
-      const ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
       const prompt = content.promptGenerator(reflectionAnswers);
-      let insight;
-      try {
-        const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const response = await model.generateContent(prompt);
-        insight = response.response.text();
-      } catch (e) { insight = "Tus reflexiones demuestran un buen nivel de autoconciencia."; }
-      setInsightResult(insight || '');
+      const insight = await generateReflectionInsight(prompt);
+      setInsightResult(insight);
       completeSkill(50, 100);
     } catch (e) { console.error(e); } finally { setIsGeneratingInsight(false); }
   };
