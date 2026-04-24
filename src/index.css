@@ -6,7 +6,7 @@
     from-${area.color}-400, to-${area.color}-500
   where area.color is: purple | cyan | green | pink
 */
-@source inline("bg-purple-50 bg-purple-100 bg-purple-100/30 bg-cyan-50 bg-cyan-100 bg-cyan-100/30 bg-green-50 bg-green-100 bg-green-100/30 bg-pink-50 bg-pink-100 bg-pink-100/30 text-purple-600 text-cyan-600 text-green-600 text-pink-600 from-purple-400 from-cyan-400 from-green-400 from-pink-400 to-purple-500 to-cyan-500 to-green-500 to-pink-500");
+@source inline("bg-purple-50 bg-purple-100 bg-purple-100/30 bg-cyan-50 bg-cyan-100 bg-cyan-100/30 bg-green-50 bg-green-100 bg-green-100/30 bg-pink-50 bg-pink-100 bg-pink-100/30 text-purple-600 text-cyan-600 text-green-600 text-pink-600 from-purple-400 from-cyan-400 from-green-400 from-pink-400 to-purple-500 to-cyan-500 to-green-500 to-pink-500 shadow-purple-200/40 shadow-cyan-200/40 shadow-green-200/40 shadow-pink-200/40");
 
 /* Custom styles migrated from index.html <style> block */
 body {
