@@ -6,7 +6,7 @@ import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, BarChart2, Awa
 import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles, getKudos, getCompanyFlexConfig } from '../src/lib/supabase-helpers';
 import { ILLUSTRATIONS, AREA_ILLUSTRATIONS } from '../utils/illustrations';
 import { ExerciseRunner } from './exercises/ExerciseRunner';
-
+import { launchConfetti } from '../src/lib/confetti';
 
 interface CompetenceMapProps {
   currentUser: User;
@@ -312,6 +312,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
 
       // 4. Update Local XP State
       setCurrentXP(newXP);
+      launchConfetti();
     } else {
       console.error('❌ Error guardando progreso en Supabase');
     }
