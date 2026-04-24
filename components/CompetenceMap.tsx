@@ -18,6 +18,8 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   const [company, setCompany] = useState<Company | null>(null);
   const [userProgress, setUserProgress] = useState<UserProgress>({});
   const [currentXP, setCurrentXP] = useState<number>(currentUser.xp || 0);
+  const [showXPGain, setShowXPGain] = useState(false);
+  const [xpGainAmount, setXpGainAmount] = useState(0);
   const [flexArea, setFlexArea] = useState<FlexArea | null>(null);
   const [collapsedAreas, setCollapsedAreas] = useState<string[]>(() => {
     try {
@@ -313,6 +315,9 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
       // 4. Update Local XP State
       setCurrentXP(newXP);
       launchConfetti();
+      setXpGainAmount(xp);
+      setShowXPGain(true);
+      setTimeout(() => setShowXPGain(false), 1800);
     } else {
       console.error('❌ Error guardando progreso en Supabase');
     }
@@ -410,12 +415,19 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
             <span>Mi Progreso</span>
           </button>
 
-          <div className="flex items-center gap-3 bg-black/20 backdrop-blur-md text-white px-4 py-2 rounded-xl border border-white/10">
-            <div className="text-right">
-              <div className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider">Nivel {calculateRank(currentXP).name}</div>
-              <div className="text-sm font-black">{currentXP} XP</div>
+          <div className="relative">
+            {showXPGain && (
+              <div className="xp-float-badge absolute -top-1 left-1/2 pointer-events-none z-50 bg-yellow-400 text-yellow-900 font-black text-sm px-3 py-1 rounded-full shadow-lg whitespace-nowrap">
+                +{xpGainAmount} XP
+              </div>
+            )}
+            <div className="flex items-center gap-3 bg-black/20 backdrop-blur-md text-white px-4 py-2 rounded-xl border border-white/10">
+              <div className="text-right">
+                <div className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider">Nivel {calculateRank(currentXP).name}</div>
+                <div className="text-sm font-black">{currentXP} XP</div>
+              </div>
+              <div className="text-2xl drop-shadow-md">{calculateRank(currentXP).emoji}</div>
             </div>
-            <div className="text-2xl drop-shadow-md">{calculateRank(currentXP).emoji}</div>
           </div>
         </div>
       </header>
