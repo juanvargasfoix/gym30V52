@@ -20,6 +20,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
   const [currentXP, setCurrentXP] = useState<number>(currentUser.xp || 0);
   const [showXPGain, setShowXPGain] = useState(false);
   const [xpGainAmount, setXpGainAmount] = useState(0);
+  const [newlyUnlockedIds, setNewlyUnlockedIds] = useState<Set<string>>(new Set());
   const [flexArea, setFlexArea] = useState<FlexArea | null>(null);
   const [collapsedAreas, setCollapsedAreas] = useState<string[]>(() => {
     try {
@@ -297,6 +298,19 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
 
     if (result) {
       // 2. Update Local State
+      const statusWith = (skill: Skill, prog: UserProgress) => {
+        if (skill.isCustom) return 'available';
+        const p = prog[skill.id];
+        if (p?.status === 'conquered' || (p?.status as any) === 'completed') return 'conquered';
+        const areaSkills = skills.filter(s => s.area === skill.area).sort((a, b) => a.order - b.order);
+        const myIndex = areaSkills.findIndex(s => s.id === skill.id);
+        if (myIndex === 0) return 'available';
+        const prev = areaSkills[myIndex - 1];
+        const prevProg = prog[prev.id];
+        return (prevProg?.status === 'conquered' || (prevProg?.status as any) === 'completed') ? 'available' : 'locked';
+      };
+      const prevLocked = new Set(skills.filter(s => statusWith(s, userProgress) === 'locked').map(s => s.id));
+
       const newProgress = {
         ...userProgress,
         [selectedSkill.id]: {
@@ -307,6 +321,12 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
         }
       };
       setUserProgress(newProgress);
+
+      const newlyUnlocked = skills.filter(s => prevLocked.has(s.id) && statusWith(s, newProgress) === 'available').map(s => s.id);
+      if (newlyUnlocked.length > 0) {
+        setNewlyUnlockedIds(new Set(newlyUnlocked));
+        setTimeout(() => setNewlyUnlockedIds(new Set()), 900);
+      }
 
       // 3. Update XP in Supabase
       const newXP = (currentUser.xp || 0) + xp;
@@ -727,6 +747,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                               ? `bg-white border-green-400 shadow-xl shadow-green-200/50 ring-4 ring-green-50 scale-[1.02]`
                               : `bg-white ${area.border} shadow-lg ${area.shadow} hover:scale-105 hover:shadow-2xl`
                           }
+                                    ${newlyUnlockedIds.has(skill.id) ? 'skill-pop' : ''}
                                  `}
                       >
                         {/* Status Badge */}

@@ -32,3 +32,14 @@ body {
 .xp-float-badge {
   animation: xp-float 1.8s ease-out forwards;
 }
+
+@keyframes skill-pop {
+  0%   { transform: scale(0.82); }
+  55%  { transform: scale(1.09); }
+  80%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+.skill-pop {
+  animation: skill-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
