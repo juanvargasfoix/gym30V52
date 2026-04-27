@@ -297,6 +297,12 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     const result = await updateSkillProgress(currentUser.id, skillUuid, 'conquered', 100);
 
     if (result) {
+      // Feedback visual inmediato — antes de cualquier await adicional
+      launchConfetti();
+      setXpGainAmount(xp);
+      setShowXPGain(true);
+      setTimeout(() => setShowXPGain(false), 1800);
+
       // 2. Update Local State
       const statusWith = (skill: Skill, prog: UserProgress) => {
         if (skill.isCustom) return 'available';
@@ -328,16 +334,10 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
         setTimeout(() => setNewlyUnlockedIds(new Set()), 900);
       }
 
-      // 3. Update XP in Supabase
+      // 3. Update XP in Supabase y estado local
       const newXP = (currentUser.xp || 0) + xp;
-      await updateProfile(currentUser.id, { xp: newXP });
-
-      // 4. Update Local XP State
       setCurrentXP(newXP);
-      launchConfetti();
-      setXpGainAmount(xp);
-      setShowXPGain(true);
-      setTimeout(() => setShowXPGain(false), 1800);
+      await updateProfile(currentUser.id, { xp: newXP });
     } else {
       console.error('❌ Error guardando progreso en Supabase');
     }
