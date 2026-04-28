@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, User as UserIcon, Award, Star } from 'lucide-react';
+import { Send, User as UserIcon, Award, Star, AlertCircle } from 'lucide-react';
 import { SkillContentC } from '../data/skill-content';
 import { generateRoleplayReply, evaluateRoleplayConversation, RoleplayEvaluation } from '../../src/lib/gemini';
 import { ILLUSTRATIONS } from '../../utils/illustrations';
@@ -24,8 +24,48 @@ export const RoleplayChat: React.FC<RoleplayChatProps> = ({ content, isAlreadyCo
   const [viewingChatHistory, setViewingChatHistory] = useState(false);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluation, setEvaluation] = useState<RoleplayEvaluation | null>(null);
+  const [evalError, setEvalError] = useState<string | null>(null);
+  // Snapshot of the conversation at the moment we tried to evaluate.
+  // Used by the retry button so we can re-evaluate the exact same transcript.
+  const [pendingEvalHistory, setPendingEvalHistory] = useState<{ rol: string; texto: string }[] | null>(null);
 
   const criteria = content.scenario.evaluationCriteria || DEFAULT_CRITERIA;
+
+  const runEvaluation = async (historyForEval: { rol: string; texto: string }[]) => {
+    setIsEvaluating(true);
+    setEvalError(null);
+    try {
+      const result = await evaluateRoleplayConversation({
+        scenario: {
+          roleName: content.scenario.roleName,
+          title: content.scenario.title,
+          situation: content.scenario.situation,
+          userRole: content.scenario.userRole,
+          goal: content.scenario.goal,
+        },
+        criteria,
+        conversation: historyForEval,
+      });
+      if (!result.ok) {
+        setPendingEvalHistory(historyForEval);
+        setEvalError(
+          result.reason === 'no-api-key'
+            ? 'La evaluación con IA no está configurada en este entorno. Contactá al administrador.'
+            : 'No pudimos evaluar tu simulación en este momento. Intentá de nuevo en unos segundos.'
+        );
+        return;
+      }
+      setEvaluation(result.data);
+      const avg = Math.round(
+        result.data.scores.reduce((a, b) => a + b, 0) / Math.max(result.data.scores.length, 1)
+      );
+      setChatFinished(true);
+      setPendingEvalHistory(null);
+      onComplete(avg);
+    } finally {
+      setIsEvaluating(false);
+    }
+  };
 
   const handleChatSend = async () => {
     if (!chatInput.trim()) return;
@@ -37,34 +77,21 @@ export const RoleplayChat: React.FC<RoleplayChatProps> = ({ content, isAlreadyCo
     setTurnCount(newTurnCount);
     if (newTurnCount >= 5) {
       setIsTyping(false);
-      setIsEvaluating(true);
-      try {
-        const result = await evaluateRoleplayConversation({
-          scenario: {
-            roleName: content.scenario.roleName,
-            title: content.scenario.title,
-            situation: content.scenario.situation,
-            userRole: content.scenario.userRole,
-            goal: content.scenario.goal,
-          },
-          criteria,
-          conversation: newHistory,
-        });
-        setEvaluation(result);
-        const avg = Math.round(
-          result.scores.reduce((a, b) => a + b, 0) / Math.max(result.scores.length, 1)
-        );
-        setChatFinished(true);
-        onComplete(avg);
-      } finally {
-        setIsEvaluating(false);
-      }
+      await runEvaluation(newHistory);
       return;
     }
     try {
       const prompt = content.promptGenerator(newHistory, chatInput, content.scenario);
       const reply = await generateRoleplayReply(prompt);
-      setChatHistory([...newHistory, { rol: content.scenario.roleName, texto: reply.respuesta }]);
+      if (!reply.ok) {
+        // Show inline error from the character so the user knows the AI failed
+        setChatHistory([...newHistory, {
+          rol: content.scenario.roleName,
+          texto: '⚠️ No pude generar una respuesta en este momento. Podés enviar otro mensaje para continuar.'
+        }]);
+      } else {
+        setChatHistory([...newHistory, { rol: content.scenario.roleName, texto: reply.data.respuesta }]);
+      }
     } catch (e) { console.error(e); } finally { setIsTyping(false); }
   };
 
@@ -74,6 +101,33 @@ export const RoleplayChat: React.FC<RoleplayChatProps> = ({ content, isAlreadyCo
         <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-6"></div>
         <h3 className="text-2xl font-black text-slate-900 mb-2">Evaluando tu simulación...</h3>
         <p className="text-slate-500">El coach está analizando la conversación contra los {criteria.length} criterios.</p>
+      </div>
+    );
+  }
+
+  if (evalError && pendingEvalHistory && !evaluation) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center p-8 text-center animate-fade-in">
+        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6">
+          <AlertCircle className="w-10 h-10 text-red-600" />
+        </div>
+        <h3 className="text-2xl font-black text-slate-900 mb-2">No se pudo evaluar la simulación</h3>
+        <p className="text-slate-600 max-w-md mb-2">{evalError}</p>
+        <p className="text-xs text-slate-400 mb-6">Tu conversación está guardada. La habilidad <strong>no</strong> se marcará como completada hasta que la evaluación sea exitosa.</p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => runEvaluation(pendingEvalHistory)}
+            className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-lg"
+          >
+            🔄 Reintentar evaluación
+          </button>
+          <button
+            onClick={onBack}
+            className="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+          >
+            🗺️ Volver al Mapa
+          </button>
+        </div>
       </div>
     );
   }

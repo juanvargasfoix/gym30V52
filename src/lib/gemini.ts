@@ -11,7 +11,25 @@ function getClient(): GoogleGenAI | null {
   return _client;
 }
 
+// ---------------------------------------------------------------------------
+// Result type — explicit success / failure for every Gemini call.
+// Reasons:
+//   'no-api-key'   → API key not configured (dev / first-deploy state).
+//   'api-error'    → network / SDK / rate-limit / model error during call.
+//   'invalid-shape'→ response parsed but didn't match expected schema.
+// ---------------------------------------------------------------------------
+export type AiFailureReason = 'no-api-key' | 'api-error' | 'invalid-shape';
+export type AsyncResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; reason: AiFailureReason };
+
 export interface TextEvaluation {
+  scores: number[];
+  feedback: string;
+  aprobado: boolean;
+}
+
+export interface RoleplayEvaluation {
   scores: number[];
   feedback: string;
   aprobado: boolean;
@@ -65,14 +83,9 @@ const ROLEPLAY_SCHEMA = {
 
 export async function evaluateTextResponse(
   prompt: string,
-): Promise<TextEvaluation> {
-  const fallback: TextEvaluation = {
-    scores: [85, 90, 80, 85],
-    feedback: "Excelente respuesta demostrando empatía y claridad.",
-    aprobado: true,
-  };
+): Promise<AsyncResult<TextEvaluation>> {
   const ai = getClient();
-  if (!ai) return fallback;
+  if (!ai) return { ok: false, reason: 'no-api-key' };
   try {
     const response = await ai.models.generateContent({
       model: MODEL,
@@ -92,23 +105,25 @@ export async function evaluateTextResponse(
       typeof parsed.feedback === "string"
     ) {
       return {
-        scores: parsed.scores,
-        feedback: parsed.feedback,
-        aprobado: Boolean(parsed.aprobado),
+        ok: true,
+        data: {
+          scores: parsed.scores,
+          feedback: parsed.feedback,
+          aprobado: Boolean(parsed.aprobado),
+        },
       };
     }
-    return fallback;
+    return { ok: false, reason: 'invalid-shape' };
   } catch {
-    return fallback;
+    return { ok: false, reason: 'api-error' };
   }
 }
 
 export async function generateRoleplayReply(
   prompt: string,
-): Promise<{ respuesta: string; score?: number }> {
-  const fallback = { respuesta: "Entiendo tu punto. ¿Podrías elaborar más?" };
+): Promise<AsyncResult<{ respuesta: string; score?: number }>> {
   const ai = getClient();
-  if (!ai) return fallback;
+  if (!ai) return { ok: false, reason: 'no-api-key' };
   try {
     const response = await ai.models.generateContent({
       model: MODEL,
@@ -123,33 +138,21 @@ export async function generateRoleplayReply(
     const text = response.text ?? "";
     const parsed = JSON.parse(text);
     if (parsed && typeof parsed.respuesta === "string" && parsed.respuesta.trim()) {
-      return { respuesta: parsed.respuesta, score: parsed.score };
+      return { ok: true, data: { respuesta: parsed.respuesta, score: parsed.score } };
     }
-    return fallback;
+    return { ok: false, reason: 'invalid-shape' };
   } catch {
-    return fallback;
+    return { ok: false, reason: 'api-error' };
   }
-}
-
-export interface RoleplayEvaluation {
-  scores: number[];
-  feedback: string;
-  aprobado: boolean;
 }
 
 export async function evaluateRoleplayConversation(params: {
   scenario: { roleName: string; title: string; situation: string; userRole: string; goal: string };
   criteria: string[];
   conversation: { rol: string; texto: string }[];
-}): Promise<RoleplayEvaluation> {
-  const fallback: RoleplayEvaluation = {
-    scores: params.criteria.map(() => 75),
-    feedback:
-      "Completaste la simulación. Revisá tus respuestas para identificar dónde podrías ser más específico, empático o claro en tu próximo intento.",
-    aprobado: true,
-  };
+}): Promise<AsyncResult<RoleplayEvaluation>> {
   const ai = getClient();
-  if (!ai) return fallback;
+  if (!ai) return { ok: false, reason: 'no-api-key' };
 
   const transcriptText = params.conversation
     .map(
@@ -192,24 +195,25 @@ Evaluá el desempeño del USUARIO según los criterios. Respondé solo el JSON.`
       typeof parsed.feedback === "string"
     ) {
       return {
-        scores: parsed.scores,
-        feedback: parsed.feedback,
-        aprobado: Boolean(parsed.aprobado),
+        ok: true,
+        data: {
+          scores: parsed.scores,
+          feedback: parsed.feedback,
+          aprobado: Boolean(parsed.aprobado),
+        },
       };
     }
-    return fallback;
+    return { ok: false, reason: 'invalid-shape' };
   } catch {
-    return fallback;
+    return { ok: false, reason: 'api-error' };
   }
 }
 
 export async function generateReflectionInsight(
   prompt: string,
-): Promise<string> {
-  const fallback =
-    "Tus reflexiones demuestran un buen nivel de autoconciencia.";
+): Promise<AsyncResult<string>> {
   const ai = getClient();
-  if (!ai) return fallback;
+  if (!ai) return { ok: false, reason: 'no-api-key' };
   try {
     const response = await ai.models.generateContent({
       model: MODEL,
@@ -219,8 +223,10 @@ export async function generateReflectionInsight(
         temperature: 0.7,
       },
     });
-    return response.text?.trim() || fallback;
+    const insight = response.text?.trim();
+    if (!insight) return { ok: false, reason: 'invalid-shape' };
+    return { ok: true, data: insight };
   } catch {
-    return fallback;
+    return { ok: false, reason: 'api-error' };
   }
 }

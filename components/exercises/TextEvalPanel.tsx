@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain, Sparkles, Award, Star } from 'lucide-react';
+import { Brain, Sparkles, Award, Star, AlertCircle } from 'lucide-react';
 import { SkillContentB } from '../data/skill-content';
 import { evaluateTextResponse } from '../../src/lib/gemini';
 
@@ -17,21 +17,31 @@ export const TextEvalPanel: React.FC<TextEvalPanelProps> = ({ content, isAlready
   const [textResponse, setTextResponse] = useState('');
   const [evaluationResult, setEvaluationResult] = useState<{ scores: number[]; feedback: string } | null>(null);
   const [isEvaluating, setIsEvaluating] = useState(false);
+  const [evalError, setEvalError] = useState<string | null>(null);
 
   const wordCount = countWords(textResponse);
 
   const handleEval = async () => {
     if (wordCount < 150) return;
     setIsEvaluating(true);
+    setEvalError(null);
     try {
       const prompt = content.evaluatorConfig.promptGenerator(textResponse);
       const result = await evaluateTextResponse(prompt);
-      setEvaluationResult(result);
-      if (result.aprobado || result.scores[0] > 60) {
-        const avgScore = Math.round(result.scores.reduce((a: number, b: number) => a + b, 0) / result.scores.length);
+      if (!result.ok) {
+        setEvalError(
+          result.reason === 'no-api-key'
+            ? 'La evaluación con IA no está configurada en este entorno. Contactá al administrador.'
+            : 'No se pudo evaluar tu respuesta en este momento. Intentá de nuevo en unos segundos.'
+        );
+        return;
+      }
+      setEvaluationResult(result.data);
+      if (result.data.aprobado || result.data.scores[0] > 60) {
+        const avgScore = Math.round(result.data.scores.reduce((a: number, b: number) => a + b, 0) / result.data.scores.length);
         onComplete(avgScore);
       }
-    } catch (e) { console.error(e); } finally { setIsEvaluating(false); }
+    } finally { setIsEvaluating(false); }
   };
 
   return (
@@ -57,6 +67,16 @@ export const TextEvalPanel: React.FC<TextEvalPanelProps> = ({ content, isAlready
         </span>
       </div>
 
+      {evalError && !evaluationResult && (
+        <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-2xl flex items-start gap-3 animate-fade-in">
+          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-bold mb-1">No se pudo evaluar</p>
+            <p className="text-sm text-red-700">{evalError}</p>
+          </div>
+        </div>
+      )}
+
       {!evaluationResult ? (
         <button
           onClick={handleEval}
@@ -64,7 +84,7 @@ export const TextEvalPanel: React.FC<TextEvalPanelProps> = ({ content, isAlready
           className="w-full py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-purple-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isEvaluating ? <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin" /> : <Sparkles className="w-6 h-6" />}
-          {isAlreadyCompleted ? 'Ejercicio Completado' : 'Enviar mi respuesta ✨'}
+          {isAlreadyCompleted ? 'Ejercicio Completado' : evalError ? 'Reintentar evaluación' : 'Enviar mi respuesta ✨'}
         </button>
       ) : (
         <div className="bg-white p-8 rounded-[2rem] border border-indigo-100 shadow-xl animate-fade-in">
