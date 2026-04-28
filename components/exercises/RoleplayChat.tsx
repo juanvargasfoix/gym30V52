@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { Send, User as UserIcon, Award, Star } from 'lucide-react';
 import { SkillContentC } from '../data/skill-content';
-import { generateRoleplayReply } from '../../src/lib/gemini';
+import { generateRoleplayReply, evaluateRoleplayConversation, RoleplayEvaluation } from '../../src/lib/gemini';
 import { ILLUSTRATIONS } from '../../utils/illustrations';
 
 interface RoleplayChatProps {
   content: SkillContentC;
   isAlreadyCompleted: boolean;
-  onComplete: () => void;
+  onComplete: (scorePercent: number) => void;
   onBack: () => void;
 }
+
+const DEFAULT_CRITERIA = ['Comunicación', 'Negociación', 'Manejo de Objeciones'];
 
 export const RoleplayChat: React.FC<RoleplayChatProps> = ({ content, isAlreadyCompleted, onComplete, onBack }) => {
   const [chatHistory, setChatHistory] = useState<{ rol: string; texto: string }[]>([
@@ -20,6 +22,10 @@ export const RoleplayChat: React.FC<RoleplayChatProps> = ({ content, isAlreadyCo
   const [turnCount, setTurnCount] = useState(0);
   const [chatFinished, setChatFinished] = useState(false);
   const [viewingChatHistory, setViewingChatHistory] = useState(false);
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [evaluation, setEvaluation] = useState<RoleplayEvaluation | null>(null);
+
+  const criteria = content.scenario.evaluationCriteria || DEFAULT_CRITERIA;
 
   const handleChatSend = async () => {
     if (!chatInput.trim()) return;
@@ -30,9 +36,29 @@ export const RoleplayChat: React.FC<RoleplayChatProps> = ({ content, isAlreadyCo
     const newTurnCount = turnCount + 1;
     setTurnCount(newTurnCount);
     if (newTurnCount >= 5) {
-      setChatFinished(true);
-      onComplete();
       setIsTyping(false);
+      setIsEvaluating(true);
+      try {
+        const result = await evaluateRoleplayConversation({
+          scenario: {
+            roleName: content.scenario.roleName,
+            title: content.scenario.title,
+            situation: content.scenario.situation,
+            userRole: content.scenario.userRole,
+            goal: content.scenario.goal,
+          },
+          criteria,
+          conversation: newHistory,
+        });
+        setEvaluation(result);
+        const avg = Math.round(
+          result.scores.reduce((a, b) => a + b, 0) / Math.max(result.scores.length, 1)
+        );
+        setChatFinished(true);
+        onComplete(avg);
+      } finally {
+        setIsEvaluating(false);
+      }
       return;
     }
     try {
@@ -42,35 +68,58 @@ export const RoleplayChat: React.FC<RoleplayChatProps> = ({ content, isAlreadyCo
     } catch (e) { console.error(e); } finally { setIsTyping(false); }
   };
 
-  if (chatFinished && !viewingChatHistory) {
+  if (isEvaluating) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center p-8 text-center animate-fade-in">
+        <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+        <h3 className="text-2xl font-black text-slate-900 mb-2">Evaluando tu simulación...</h3>
+        <p className="text-slate-500">El coach está analizando la conversación contra los {criteria.length} criterios.</p>
+      </div>
+    );
+  }
+
+  if (chatFinished && !viewingChatHistory && evaluation) {
+    const avgScore = Math.round(
+      evaluation.scores.reduce((a, b) => a + b, 0) / Math.max(evaluation.scores.length, 1)
+    );
     return (
       <div className="h-full flex flex-col items-center justify-center p-8 text-center animate-fade-in">
         <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 p-4">
           <img src={ILLUSTRATIONS.ourSolution} alt="Completado" className="w-16 h-16" loading="lazy" />
         </div>
         <h3 className="text-4xl font-black text-slate-900 mb-2">¡Simulación Completada!</h3>
-        <div className="flex gap-4 mb-8">
+        <div className="flex gap-4 mb-8 flex-wrap justify-center">
           <span className="bg-green-100 text-green-700 px-4 py-1 rounded-full font-bold">✅ +50 XP Ganados</span>
           <span className="bg-blue-100 text-blue-700 px-4 py-1 rounded-full font-bold">🎯 5 Turnos</span>
+          <span className={`px-4 py-1 rounded-full font-bold ${avgScore >= 60 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+            ⭐ Promedio {avgScore}/100
+          </span>
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-lg w-full max-w-lg mb-8 text-left">
           <h4 className="font-bold text-slate-800 mb-4 border-b pb-2">📊 Evaluación de Desempeño</h4>
           <div className="space-y-3 mb-6">
-            {(content.scenario.evaluationCriteria || ['Comunicación', 'Negociación', 'Manejo de Objeciones']).map((criterion, idx) => (
-              <div key={idx} className="flex justify-between items-center">
-                <span className="text-sm font-medium text-slate-600">{criterion}</span>
-                <div className="flex text-yellow-400">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className={`w-4 h-4 ${star <= (idx === 0 ? 5 : 4) ? 'fill-current' : 'text-slate-200'}`} />
-                  ))}
+            {criteria.map((criterion, idx) => {
+              const score = evaluation.scores[idx] ?? 0;
+              const filled = Math.max(0, Math.min(5, Math.round(score / 20)));
+              return (
+                <div key={idx} className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-slate-600">{criterion}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-400 w-10 text-right">{score}/100</span>
+                    <div className="flex text-yellow-400">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star key={star} className={`w-4 h-4 ${star <= filled ? 'fill-current' : 'text-slate-200'}`} />
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <div className="bg-indigo-50 p-4 rounded-xl">
             <p className="text-xs font-bold text-indigo-500 uppercase mb-1">💬 Feedback del Coach</p>
-            <p className="text-sm text-indigo-900 italic">"Excelente manejo de la situación. Lograste mantener la calma y proponer soluciones constructivas sin ceder en los puntos críticos."</p>
+            <p className="text-sm text-indigo-900 italic">"{evaluation.feedback}"</p>
           </div>
         </div>
 

@@ -68,7 +68,7 @@ export const ExerciseRunner: React.FC<ExerciseRunnerProps> = ({ contentKey, isAl
           <RoleplayChat
             content={content as SkillContentC}
             isAlreadyCompleted={isAlreadyCompleted}
-            onComplete={() => onComplete(100)}
+            onComplete={onComplete}
             onBack={onBack}
           />
         )}
