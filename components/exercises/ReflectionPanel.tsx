@@ -38,7 +38,7 @@ export const ReflectionPanel: React.FC<ReflectionPanelProps> = ({ content, isAlr
     try {
       const prompt = content.promptGenerator(reflectionAnswers);
       const result = await generateReflectionInsight(prompt);
-      if (!result.ok) {
+      if (result.ok === false) {
         // The user reflected validly — credit the skill once, but surface the
         // failure so they know the insight wasn't generated.
         setInsightError(

@@ -46,7 +46,7 @@ export const RoleplayChat: React.FC<RoleplayChatProps> = ({ content, isAlreadyCo
         criteria,
         conversation: historyForEval,
       });
-      if (!result.ok) {
+      if (result.ok === false) {
         setPendingEvalHistory(historyForEval);
         setEvalError(
           result.reason === 'no-api-key'

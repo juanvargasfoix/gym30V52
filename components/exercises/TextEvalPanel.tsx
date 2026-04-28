@@ -28,7 +28,7 @@ export const TextEvalPanel: React.FC<TextEvalPanelProps> = ({ content, isAlready
     try {
       const prompt = content.evaluatorConfig.promptGenerator(textResponse);
       const result = await evaluateTextResponse(prompt);
-      if (!result.ok) {
+      if (result.ok === false) {
         setEvalError(
           result.reason === 'no-api-key'
             ? 'La evaluación con IA no está configurada en este entorno. Contactá al administrador.'
