@@ -380,6 +380,98 @@ export const getAllKudos = async (empresaId?: string) => {
     }
 }
 
+// ==================== KUDOS READ STATE ====================
+// Stores which kudo IDs a user has marked as read.
+// Lives on `profiles.kudos_read_ids text[]` (see supabase/migrations/2026-04-22-kudos-read-ids.sql).
+// If the column does not yet exist (migration not applied), we fall back to
+// localStorage transparently so deploys can ship in any order.
+
+const LS_KUDOS_READ_KEY = 'kudosLeidos'
+
+const isMissingColumnError = (error: any): boolean => {
+    if (!error) return false
+    // PostgREST returns code 42703 for "undefined_column".
+    // Some Supabase deployments wrap this in different shapes, so we also
+    // check the message text as a defensive fallback.
+    if (error.code === '42703') return true
+    const msg = (error.message || '').toLowerCase()
+    return msg.includes('kudos_read_ids') && msg.includes('does not exist')
+}
+
+const readLocalKudosReadIds = (): string[] => {
+    try {
+        const raw = localStorage.getItem(LS_KUDOS_READ_KEY)
+        return raw ? JSON.parse(raw) : []
+    } catch {
+        return []
+    }
+}
+
+const writeLocalKudosReadIds = (ids: string[]) => {
+    try {
+        localStorage.setItem(LS_KUDOS_READ_KEY, JSON.stringify(ids))
+    } catch {
+        // ignore — quota / private mode / SSR
+    }
+}
+
+export const getKudosReadIds = async (userId: string): Promise<string[]> => {
+    try {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('kudos_read_ids')
+            .eq('id', userId)
+            .single()
+
+        if (error) {
+            if (isMissingColumnError(error)) {
+                return readLocalKudosReadIds()
+            }
+            throw error
+        }
+        return Array.isArray(data?.kudos_read_ids) ? data.kudos_read_ids : []
+    } catch (error) {
+        if (isMissingColumnError(error)) {
+            return readLocalKudosReadIds()
+        }
+        console.error('Error getting kudos read ids:', error)
+        // Last-resort fallback so unread badges still work offline.
+        return readLocalKudosReadIds()
+    }
+}
+
+export const setKudosReadIds = async (userId: string, ids: string[]): Promise<void> => {
+    try {
+        const { error } = await supabase
+            .from('profiles')
+            .update({
+                kudos_read_ids: ids,
+                updated_at: new Date().toISOString(),
+            })
+            .eq('id', userId)
+
+        if (error) {
+            if (isMissingColumnError(error)) {
+                writeLocalKudosReadIds(ids)
+                return
+            }
+            throw error
+        }
+        // Mirror to localStorage too while we're transitioning, so a user
+        // who logs in on a partially-migrated environment still sees the
+        // correct unread count immediately on next load.
+        writeLocalKudosReadIds(ids)
+    } catch (error) {
+        if (isMissingColumnError(error)) {
+            writeLocalKudosReadIds(ids)
+            return
+        }
+        console.error('Error setting kudos read ids:', error)
+        // Don't lose the user's "I read these" state if Supabase is flaky.
+        writeLocalKudosReadIds(ids)
+    }
+}
+
 // ==================== GYM CONFIG ====================
 export const getGymConfig = async () => {
     try {

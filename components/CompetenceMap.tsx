@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Skill, Company, UserProgress, Kudo, FlexArea } from '../types';
 import { calculateRank, ranks } from '../utils/data';
 import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, BarChart2, Award, TrendingUp, AlertCircle, Star, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
-import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles, getKudos, getCompanyFlexConfig } from '../src/lib/supabase-helpers';
+import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles, getKudos, getCompanyFlexConfig, getKudosReadIds, setKudosReadIds } from '../src/lib/supabase-helpers';
 import { ILLUSTRATIONS, AREA_ILLUSTRATIONS } from '../utils/illustrations';
 import { ExerciseRunner } from './exercises/ExerciseRunner';
 import { launchConfetti } from '../src/lib/confetti';
@@ -68,8 +68,10 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
       })).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       setKudosRecibidos(misKudos);
 
-      // kudosLeidos se mantiene en localStorage (preferencia UI local)
-      const leidos = JSON.parse(localStorage.getItem('kudosLeidos') || '[]');
+      // kudosLeidos: ahora persistido en Supabase (profiles.kudos_read_ids).
+      // El helper hace fallback transparente a localStorage si la columna
+      // todavía no existe en este entorno.
+      const leidos = await getKudosReadIds(currentUser.id!);
       const unreadCount = misKudos.filter((k: any) => !leidos.includes(k.id)).length;
       setKudosNoLeidos(unreadCount);
       if (unreadCount > 0 && !sessionStorage.getItem('kudosModalShown')) {
@@ -82,12 +84,19 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     loadKudos();
   }, [currentUser]);
 
-  const marcarKudosComoLeidos = () => {
-    const leidos = JSON.parse(localStorage.getItem('kudosLeidos') || '[]');
+  const marcarKudosComoLeidos = async () => {
+    if (!currentUser.id) {
+      setKudosNoLeidos(0);
+      return;
+    }
+    // UI optimista: bajamos el contador antes de la persistencia para que el
+    // usuario vea la respuesta inmediata. Si Supabase falla, el helper hace
+    // fallback a localStorage para no perder el estado.
+    setKudosNoLeidos(0);
+    const leidos = await getKudosReadIds(currentUser.id);
     const ids = kudosRecibidos.map(k => k.id);
     const nuevos = Array.from(new Set([...leidos, ...ids]));
-    localStorage.setItem('kudosLeidos', JSON.stringify(nuevos));
-    setKudosNoLeidos(0);
+    await setKudosReadIds(currentUser.id, nuevos);
   };
 
   useEffect(() => {
