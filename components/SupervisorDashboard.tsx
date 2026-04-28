@@ -68,7 +68,7 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
         from: k.from_user?.username || '',
         to: k.to_user?.username || '',
         message: k.message,
-        value: 'Reconocimiento Especial',
+        value: k.value || 'Reconocimiento',
         createdAt: k.created_at,
         company: currentUser.company || ''
       }));
@@ -214,8 +214,10 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
     const targetUser = team.find(u => u.username === selectedUser);
     if (!targetUser?.id) return;
 
-    // Enviar kudo via Supabase (también actualiza XP del receptor)
-    const result = await sendKudo(currentUser.id, targetUser.id, cleanMessage, 10);
+    // Enviar kudo via Supabase (también actualiza XP del receptor).
+    // El value es opcional: si la columna kudos.value no existe todavía
+    // (migración no aplicada), el helper hace fallback automático.
+    const result = await sendKudo(currentUser.id, targetUser.id, cleanMessage, 10, kudoValue);
 
     if (result) {
       // Actualizar XP local del miembro del equipo
@@ -225,13 +227,14 @@ export const SupervisorDashboard: React.FC<SupervisorDashboardProps> = ({ curren
           : u
       ));
 
-      // Agregar kudo a la lista local
+      // Agregar kudo a la lista local. Preferimos el value devuelto por el
+      // server (post-migración) y caemos a kudoValue local como respaldo.
       const newKudo: Kudo = {
         id: result.id,
         from: currentUser.username,
         to: selectedUser,
         message: cleanMessage,
-        value: kudoValue,
+        value: result.value || kudoValue,
         createdAt: result.created_at,
         company: currentUser.company || ''
       };

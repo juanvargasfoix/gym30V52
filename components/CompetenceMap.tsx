@@ -63,7 +63,7 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
         from: k.from_user_id || '',
         to: currentUser.username,
         message: k.message,
-        value: 'Reconocimiento',
+        value: k.value || 'Reconocimiento',
         createdAt: k.created_at,
       })).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       setKudosRecibidos(misKudos);

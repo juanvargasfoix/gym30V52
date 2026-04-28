@@ -304,19 +304,47 @@ export const getCompanyProgress = async (empresaId: string) => {
 }
 
 // ==================== KUDOS ====================
-export const sendKudo = async (fromUserId: string, toUserId: string, message: string, xpAwarded: number = 10) => {
+const isMissingValueColumnError = (error: any): boolean => {
+    if (!error) return false
+    if (error.code === '42703') return true
+    const msg = (error.message || '').toLowerCase()
+    return msg.includes("'value'") || (msg.includes('column') && msg.includes('value') && msg.includes('does not exist'))
+}
+
+export const sendKudo = async (
+    fromUserId: string,
+    toUserId: string,
+    message: string,
+    xpAwarded: number = 10,
+    value?: string
+) => {
     try {
-        const { data, error } = await supabase
+        const basePayload = {
+            from_user_id: fromUserId,
+            to_user_id: toUserId,
+            message,
+            xp_awarded: xpAwarded,
+            created_at: new Date().toISOString()
+        }
+        const payload = value ? { ...basePayload, value } : basePayload
+
+        let { data, error } = await supabase
             .from('kudos')
-            .insert({
-                from_user_id: fromUserId,
-                to_user_id: toUserId,
-                message,
-                xp_awarded: xpAwarded,
-                created_at: new Date().toISOString()
-            })
+            .insert(payload)
             .select()
             .single()
+
+        // If the migration adding `value` hasn't been applied yet, retry
+        // without the field so kudos keep working.
+        if (error && value && isMissingValueColumnError(error)) {
+            const retry = await supabase
+                .from('kudos')
+                .insert(basePayload)
+                .select()
+                .single()
+            data = retry.data
+            error = retry.error
+        }
 
         if (error) throw error
 
