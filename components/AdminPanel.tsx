@@ -408,7 +408,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser, onLogout })
                 area: newSkillForm.area as AreaType, // Type casting since Productividad is technically string
                 description: newSkillForm.description,
                 order: order,
-                isCustom: true
+                isCustom: true,
+                contentKey: '' // Skills custom no tienen content_key (no hay SKILL_CONTENT entry)
             };
             saveSkills([...skills, newSkill]);
         }
