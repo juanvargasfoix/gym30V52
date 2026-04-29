@@ -132,7 +132,7 @@ export const ReflectionPanel: React.FC<ReflectionPanelProps> = ({ content, isAlr
             <span className="font-black text-xl text-pink-700">Insight del Coach</span>
           </div>
           <p className="text-slate-800 text-lg leading-relaxed italic mb-6">"{insightResult}"</p>
-          <button onClick={onBack} className="w-full py-4 bg-green-500 text-white font-bold rounded-2xl hover:scale-105 transition-transform shadow-lg">¡Entendido! (+50 XP)</button>
+          <button onClick={onBack} className="w-full py-4 bg-green-500 text-white font-bold rounded-2xl hover:scale-105 transition-transform shadow-lg">¡Entendido!</button>
         </div>
       )}
     </div>
