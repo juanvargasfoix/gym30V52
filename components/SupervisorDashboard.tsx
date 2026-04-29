@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { User, Kudo, UserProgress } from '../types';
+import { User, Kudo } from '../types';
 import { calculateRank } from '../utils/data';
-import { LogOut, Heart, Award, TrendingUp, Users, X, Send, Medal, Star, Map as MapIcon } from 'lucide-react';
+import { LogOut, Heart, TrendingUp, Users, Send, Medal, Star, Map as MapIcon } from 'lucide-react';
 import { supabase } from '../src/lib/supabase';
 import { getCompanyProgress, getCompany, getAllKudos, sendKudo } from '../src/lib/supabase-helpers';
 import { ILLUSTRATIONS } from '../utils/illustrations';

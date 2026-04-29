@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Skill, Company, UserProgress, Kudo, FlexArea } from '../types';
 import { calculateRank, ranks } from '../utils/data';
-import { LogOut, Lock, ChevronDown, ChevronRight, X, CheckCircle, BarChart2, Award, TrendingUp, AlertCircle, Star, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
+import { LogOut, Lock, ChevronDown, X, CheckCircle, BarChart2, Award, TrendingUp, Heart, ArrowRight, Check, Trophy, Medal } from 'lucide-react';
 import { getSkills, getUserProgress, updateSkillProgress, updateProfile, getCompany, getAllProfiles, getKudos, getCompanyFlexConfig, getKudosReadIds, setKudosReadIds } from '../src/lib/supabase-helpers';
 import { ILLUSTRATIONS, AREA_ILLUSTRATIONS } from '../utils/illustrations';
 import { ExerciseRunner } from './exercises/ExerciseRunner';
