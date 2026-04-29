@@ -1,0 +1,46 @@
+name: Check
+
+# Corre en cada push a main y en cada PR contra main.
+# Verifica que el código compile (npm run build) y que no haya errores de
+# tipo (tsc --noEmit). Si algo falla, GitHub marca el commit con ✗ y
+# bloquea el merge.
+#
+# No corre tests automatizados (el repo no tiene aún) ni deploya
+# (Cloudflare Pages se encarga de eso por su lado).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Si llega un push nuevo mientras un check anterior sigue corriendo,
+# cancelamos el viejo. Ahorra minutos de Actions y evita resultados
+# desactualizados.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Build + TypeScript
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
