@@ -18,7 +18,7 @@ create table profiles (
     id uuid primary key references auth.users on delete cascade,
     username text unique not null,
     email text unique not null,
-    role text check (role in ('participante', 'coordinador', 'admin')) default 'participante',
+    role text check (role in ('participante', 'supervisor', 'admin')) default 'participante',
     empresa_id uuid references companies(id),
     perfil jsonb,
     xp integer default 0,
@@ -116,10 +116,10 @@ create policy "Users can manage their own progress"
 on user_progress for all
 using (user_id = auth.uid());
 
-create policy "Coordinators can view their company's progress"
+create policy "Supervisors can view their company's progress"
 on user_progress for select
 using (
-    (select role from profiles where id = auth.uid()) in ('coordinador', 'admin')
+    (select role from profiles where id = auth.uid()) in ('supervisor', 'admin')
     and user_id in (
         select id from profiles where empresa_id = (select empresa_id from profiles where id = auth.uid())
     )
@@ -132,7 +132,7 @@ using (to_user_id = auth.uid() or from_user_id = auth.uid());
 
 create policy "Privileged roles can send kudos"
 on kudos for insert
-with check ((select role from profiles where id = auth.uid()) in ('coordinador', 'admin'));
+with check ((select role from profiles where id = auth.uid()) in ('supervisor', 'admin'));
 
 -- INDICES
 create index idx_profiles_empresa_id on profiles(empresa_id);
