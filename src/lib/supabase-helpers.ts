@@ -219,11 +219,19 @@ export const getUserProgress = async (userId: string) => {
     }
 }
 
+const isMissingEvaluationDataColumnError = (error: any): boolean => {
+    if (!error) return false
+    if (error.code === '42703') return true
+    const msg = (error.message || '').toLowerCase()
+    return msg.includes('evaluation_data') && msg.includes('does not exist')
+}
+
 export const updateSkillProgress = async (
     userId: string,
     skillId: string,
     status: 'bloqueada' | 'disponible' | 'en-progreso' | 'conquered',
-    ejerciciosCompletados?: number
+    ejerciciosCompletados?: number,
+    evaluationData?: any
 ) => {
     try {
         // Buscar si ya existe el progreso
@@ -234,37 +242,68 @@ export const updateSkillProgress = async (
             .eq('skill_id', skillId)
             .single()
 
+        const baseUpdate: any = {
+            status,
+            ejercicios_completados: ejerciciosCompletados,
+            completed_at: status === 'conquered' ? new Date().toISOString() : null,
+            updated_at: new Date().toISOString()
+        }
+        const updatePayload = evaluationData !== undefined
+            ? { ...baseUpdate, evaluation_data: evaluationData }
+            : baseUpdate
+
+        const baseInsert: any = {
+            user_id: userId,
+            skill_id: skillId,
+            status,
+            ejercicios_completados: ejerciciosCompletados || 0,
+            completed_at: status === 'conquered' ? new Date().toISOString() : null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        }
+        const insertPayload = evaluationData !== undefined
+            ? { ...baseInsert, evaluation_data: evaluationData }
+            : baseInsert
+
         if (existing) {
-            // Update
-            const { data, error } = await supabase
+            // Update — try with evaluation_data first, fallback if column missing.
+            let { data, error } = await supabase
                 .from('user_progress')
-                .update({
-                    status,
-                    ejercicios_completados: ejerciciosCompletados,
-                    completed_at: status === 'conquered' ? new Date().toISOString() : null,
-                    updated_at: new Date().toISOString()
-                })
+                .update(updatePayload)
                 .eq('id', existing.id)
                 .select()
                 .single()
 
+            if (error && evaluationData !== undefined && isMissingEvaluationDataColumnError(error)) {
+                const retry = await supabase
+                    .from('user_progress')
+                    .update(baseUpdate)
+                    .eq('id', existing.id)
+                    .select()
+                    .single()
+                data = retry.data
+                error = retry.error
+            }
+
             if (error) throw error
             return data
         } else {
-            // Insert
-            const { data, error } = await supabase
+            // Insert — same fallback pattern.
+            let { data, error } = await supabase
                 .from('user_progress')
-                .insert({
-                    user_id: userId,
-                    skill_id: skillId,
-                    status,
-                    ejercicios_completados: ejerciciosCompletados || 0,
-                    completed_at: status === 'conquered' ? new Date().toISOString() : null,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                })
+                .insert(insertPayload)
                 .select()
                 .single()
+
+            if (error && evaluationData !== undefined && isMissingEvaluationDataColumnError(error)) {
+                const retry = await supabase
+                    .from('user_progress')
+                    .insert(baseInsert)
+                    .select()
+                    .single()
+                data = retry.data
+                error = retry.error
+            }
 
             if (error) throw error
             return data

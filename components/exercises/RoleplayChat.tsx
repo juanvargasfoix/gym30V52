@@ -4,32 +4,57 @@ import { SkillContentC } from '../data/skill-content';
 import { generateRoleplayReply, evaluateRoleplayConversation, RoleplayEvaluation } from '../../src/lib/gemini';
 import { ILLUSTRATIONS } from '../../utils/illustrations';
 
+// Shape of the persisted Roleplay evaluation in user_progress.evaluation_data.
+// Stored when the user finishes a Type C skill and rehydrated when they
+// revisit the same skill so they can re-read the coach's feedback.
+export interface RoleplayEvaluationData {
+  type: 'C';
+  scores: number[];
+  feedback: string;
+  criteria: string[];
+  transcript: { rol: string; texto: string }[];
+}
+
 interface RoleplayChatProps {
   content: SkillContentC;
   isAlreadyCompleted: boolean;
-  onComplete: (scorePercent: number) => void;
+  pastEvaluation?: RoleplayEvaluationData | null;
+  onComplete: (scorePercent: number, evaluationData?: RoleplayEvaluationData) => void;
   onBack: () => void;
 }
 
 const DEFAULT_CRITERIA = ['Comunicación', 'Negociación', 'Manejo de Objeciones'];
 
-export const RoleplayChat: React.FC<RoleplayChatProps> = ({ content, isAlreadyCompleted, onComplete, onBack }) => {
-  const [chatHistory, setChatHistory] = useState<{ rol: string; texto: string }[]>([
-    { rol: content.scenario.roleName, texto: content.scenario.initialMessage }
-  ]);
+export const RoleplayChat: React.FC<RoleplayChatProps> = ({ content, isAlreadyCompleted, pastEvaluation, onComplete, onBack }) => {
+  // If we're revisiting an already-completed skill and we have stored eval
+  // data, hydrate the result screen directly instead of resetting the chat.
+  const hydratedFromPast = isAlreadyCompleted && !!pastEvaluation;
+
+  const [chatHistory, setChatHistory] = useState<{ rol: string; texto: string }[]>(
+    hydratedFromPast && pastEvaluation
+      ? pastEvaluation.transcript
+      : [{ rol: content.scenario.roleName, texto: content.scenario.initialMessage }]
+  );
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [turnCount, setTurnCount] = useState(0);
-  const [chatFinished, setChatFinished] = useState(false);
+  const [turnCount, setTurnCount] = useState(hydratedFromPast ? 5 : 0);
+  const [chatFinished, setChatFinished] = useState(hydratedFromPast);
   const [viewingChatHistory, setViewingChatHistory] = useState(false);
   const [isEvaluating, setIsEvaluating] = useState(false);
-  const [evaluation, setEvaluation] = useState<RoleplayEvaluation | null>(null);
+  const [evaluation, setEvaluation] = useState<RoleplayEvaluation | null>(
+    hydratedFromPast && pastEvaluation
+      ? { scores: pastEvaluation.scores, feedback: pastEvaluation.feedback, aprobado: true }
+      : null
+  );
   const [evalError, setEvalError] = useState<string | null>(null);
   // Snapshot of the conversation at the moment we tried to evaluate.
   // Used by the retry button so we can re-evaluate the exact same transcript.
   const [pendingEvalHistory, setPendingEvalHistory] = useState<{ rol: string; texto: string }[] | null>(null);
 
-  const criteria = content.scenario.evaluationCriteria || DEFAULT_CRITERIA;
+  // Use stored criteria from past eval (for label consistency) or scenario's.
+  const criteria = (hydratedFromPast && pastEvaluation?.criteria)
+    ? pastEvaluation.criteria
+    : (content.scenario.evaluationCriteria || DEFAULT_CRITERIA);
 
   const runEvaluation = async (historyForEval: { rol: string; texto: string }[]) => {
     setIsEvaluating(true);
@@ -61,7 +86,16 @@ export const RoleplayChat: React.FC<RoleplayChatProps> = ({ content, isAlreadyCo
       );
       setChatFinished(true);
       setPendingEvalHistory(null);
-      onComplete(avg);
+      // Bundle the full evaluation so the parent can persist it to
+      // user_progress.evaluation_data and rehydrate on revisit.
+      const evalDataForPersist: RoleplayEvaluationData = {
+        type: 'C',
+        scores: result.data.scores,
+        feedback: result.data.feedback,
+        criteria,
+        transcript: historyForEval,
+      };
+      onComplete(avg, evalDataForPersist);
     } finally {
       setIsEvaluating(false);
     }

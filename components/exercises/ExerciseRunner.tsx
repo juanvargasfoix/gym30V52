@@ -3,17 +3,20 @@ import { User as UserIcon, Award } from 'lucide-react';
 import { SKILL_CONTENT, SkillContentA, SkillContentB, SkillContentC, SkillContentD } from '../data/skill-content';
 import { QuizPanel } from './QuizPanel';
 import { TextEvalPanel } from './TextEvalPanel';
-import { RoleplayChat } from './RoleplayChat';
+import { RoleplayChat, RoleplayEvaluationData } from './RoleplayChat';
 import { ReflectionPanel } from './ReflectionPanel';
 
 interface ExerciseRunnerProps {
   contentKey: string;
   isAlreadyCompleted: boolean;
-  onComplete: (scorePercent: number) => void;
+  // Stored evaluation for this skill, if any. Used to rehydrate the
+  // result screen on revisit (currently consumed only by Tipo C).
+  pastEvaluation?: RoleplayEvaluationData | null;
+  onComplete: (scorePercent: number, evaluationData?: RoleplayEvaluationData) => void;
   onBack: () => void;
 }
 
-export const ExerciseRunner: React.FC<ExerciseRunnerProps> = ({ contentKey, isAlreadyCompleted, onComplete, onBack }) => {
+export const ExerciseRunner: React.FC<ExerciseRunnerProps> = ({ contentKey, isAlreadyCompleted, pastEvaluation, onComplete, onBack }) => {
   const content = SKILL_CONTENT[contentKey];
 
   if (!content) {
@@ -68,6 +71,7 @@ export const ExerciseRunner: React.FC<ExerciseRunnerProps> = ({ contentKey, isAl
           <RoleplayChat
             content={content as SkillContentC}
             isAlreadyCompleted={isAlreadyCompleted}
+            pastEvaluation={pastEvaluation}
             onComplete={onComplete}
             onBack={onBack}
           />

@@ -158,7 +158,11 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
               status: (p.status === 'completada' || p.status === 'completed') ? 'conquered' : p.status,
               xpEarned: p.xp_ganada || 0,
               score: p.score,
-              conqueredAt: p.completed_at
+              conqueredAt: p.completed_at,
+              // Pasar evaluation_data crudo (puede ser null si la columna
+              // no existe todavía o si la skill se completó antes de que
+              // existiera la columna). RoleplayChat lo usa para rehidratar.
+              evaluation_data: p.evaluation_data ?? null,
             } as any;
           });
           setUserProgress(mappedProgress);
@@ -298,12 +302,14 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
     localStorage.setItem('collapsedAreas', JSON.stringify(newCollapsed));
   };
 
-  const completeSkill = async (xp: number, score: number = 100) => {
+  const completeSkill = async (xp: number, score: number = 100, evaluationData?: any) => {
     if (!selectedSkill || !currentUser.id) return;
 
-    // 1. Update Progress in Supabase
+    // 1. Update Progress in Supabase. Si viene evaluationData (Tipo C
+    //    actualmente), se persiste también en user_progress.evaluation_data
+    //    para poder rehidratar la pantalla de resultados al re-entrar.
     const skillUuid = (skills.find(s => s.id === selectedSkill.id) as any)?.uuid || selectedSkill.id;
-    const result = await updateSkillProgress(currentUser.id, skillUuid, 'conquered', 100);
+    const result = await updateSkillProgress(currentUser.id, skillUuid, 'conquered', 100, evaluationData);
 
     if (result) {
       // Feedback visual inmediato — antes de cualquier await adicional
@@ -332,8 +338,11 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
           status: 'conquered' as const,
           xpEarned: xp,
           score: score,
-          conqueredAt: new Date().toISOString()
-        }
+          conqueredAt: new Date().toISOString(),
+          // Persistir local también — si el usuario revisita la skill en
+          // la misma sesión sin recargar, RoleplayChat puede rehidratar.
+          evaluation_data: evaluationData ?? null,
+        } as any
       };
       setUserProgress(newProgress);
 
@@ -842,7 +851,13 @@ export const CompetenceMap: React.FC<CompetenceMapProps> = ({ currentUser, onLog
                   key={selectedSkill.contentKey}
                   contentKey={selectedSkill.contentKey}
                   isAlreadyCompleted={!!isAlreadyCompleted}
-                  onComplete={(pct) => completeSkill(50, pct)}
+                  pastEvaluation={
+                    // Hidratación: si la skill ya fue completada y guardó
+                    // evaluation_data (Tipo C), pasamos los datos al panel
+                    // para mostrar resultados directos en lugar de chat.
+                    (userProgress[selectedSkill.id] as any)?.evaluation_data || null
+                  }
+                  onComplete={(pct, evalData) => completeSkill(50, pct, evalData)}
                   onBack={() => setSelectedSkill(null)}
                 />
               </div>
